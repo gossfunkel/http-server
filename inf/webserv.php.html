@@ -1,0 +1,229 @@
+<!--?xml version="1.0" encoding="iso-8859-1"?-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <title>Simple TCP/IP web server</title>
+  <link rel="stylesheet" href="webserv.php_files/general.css" type="text/css" media="screen">
+  <link rel="Help" href="http://www.paulgriffiths.net/sitemap.php">
+  <link rel="Start" href="http://www.paulgriffiths.net/program/c/sockets.php">
+  <link rel="Prev" href="http://www.paulgriffiths.net/program/c/timeclnt.php">
+  <meta name="description" content="C programming example demonstrating how to implement a simple TCP/UIP web server.">
+  <meta name="keywords" content="Paul, Griffiths, Paul Griffiths, C, Programming, Program, TCP/IP, web, server, web server, network, network programming, sockets, Berkeley Sockets, HTTP, HTML">
+  <meta name="author" content="Paul Griffiths">
+  <meta name="copyright" content="Copyright 2007 Paul Griffiths">
+  <link rel="icon" href="http://www.paulgriffiths.net/images/general/favicon.ico">
+</head>
+
+<body>
+
+<div id="main">
+<div id="content">
+
+<h1>Simple TCP/IP web server</h1>
+
+<p>This program implements a (very) simple web server.</p>
+
+
+<!--  Programming issues  -->
+
+<h2>Programming Issues</h2>
+
+<p>The networking issues are actually fairly trivial. HTTP
+is essentially a text-based protocol which runs over TCP/IP (though
+it can run over any transport protocol). The essential network steps
+are:</p>
+
+<ul>
+  <li>Create a listening socket</li>
+  <li>Accept a connection with it</li>
+  <li>Fork a child process to service the connection, whilst
+    the parent process goes back to accept more connections.</li>
+  <li>Read in the HTTP request</li>
+  <li>Send the HTTP response</li>
+  <li>Send the entity requested (e.g. an HTML document)</li>
+</ul>
+
+<p>The bulk of the code involves interpreting the HTTP request
+and sending the HTTP response according to the protocol (though
+this server is by no means 100% compliant with any HTTP protocol).
+In order to effectively facilitate communication, HTTP requests
+and reponses must follow a strict convention.</p>
+
+<p>HTTP requests can be <em>simple</em> or <em>full</em>. A simple
+request contains one line only, and looks like this:</p>
+
+<p class="code"><code>GET /index.html</code></p>
+
+<p>A full request can contain more than one line, and a blank
+line <strong>must</strong> be sent at the end to signify the
+end of the request:</p>
+
+<pre>GET /index.html HTTP/1.0
+Host: www.paulgriffiths.net
+User-Agent: Lynx/2.8.1rel.2 libwww-FM/2.14
+Accept-Encoding: gzip, compress
+Accept-Language: en
+&lt;BLANK LINE&gt;</pre>
+
+<p>The number of headers following the <em>request line</em> is
+variable, which is why the blank line is needed to let the server
+know when they have all been transmitted. </p>
+
+<p>The server must decipher this request, and make an appropriate
+response. Presuming the above file exists, the HTTP response
+generated may look like:</p>
+
+<pre>HTTP/1.0 200 OK
+Server: PGWebServ v0.1
+Content-Type: text/html
+&lt;BLANK LINE&gt;</pre>
+
+<p>Again, a blank line must be sent to signify where the headers
+end.</p>
+
+<p>Following the response, the <em>entity</em> (e.g. an HTML
+document, a JPEG file) is transmitted. Once this is complete,
+the connection is terminated. With a simple HTTP request, only
+the entity is sent; no HTTP response is generated.</p>
+
+
+<!--  Program usage  -->
+
+<h2>Usage</h2>
+
+<p>This program has been written and tested on Redhat Linux 6.0.
+It should port without modification to other UNIX systems (with
+the possible exception of the makefile), but will not generally
+work on other platforms.</p>
+
+<p>To keep things simple, the feature list of this server is
+fairly restricted. For example:</p>
+
+<ul>
+  <li>There are no configuration files; all options are
+    hard-coded</li>
+  <li>The server can only return HTML documents (actually
+    the server will return any file, but the HTTP response
+    will specify the content-length as "text/html"</li>
+  <li>There is no support for CGI or SSI</li>
+  <li>No log files are produced.</li>
+  <li>Importantly, with the exception of basic C error
+    checking, <strong>there are no security measures
+    included whatsoever!</strong> This program was written
+    for basic instructional and demonstration purposes. Do
+    <strong>not</strong> run it on any machine connected
+    to an external network.</li>
+</ul>
+
+
+<!--  Source and downloads  -->
+
+<h2>Source and Downloads</h2>
+
+<ul class="menu">
+  <li><a href="http://www.paulgriffiths.net/program/c/srcs/webservsrc.html">View the C source in HTML
+    format</a></li>
+  <li><a href="http://www.paulgriffiths.net/program/c/srcs/webserv.tar.gz">Download the tarred, gzipped source</a></li>
+  <li><a href="http://www.paulgriffiths.net/program/c/srcs/webserv.zip">Download the zipped source</a></li>
+</ul>
+
+<div id="sectionlinks">
+<p><a id="prevlink" href="http://www.paulgriffiths.net/program/c/timeclnt.php">Previous: Simple TCP/IP time client</a></p>
+</div>  <!--  #sectionlinks  -->
+
+
+<div id="footer"><p id="copyright">© Copyright 1995&#8211;2012 Paul Griffiths</p></div>
+
+</div>  <!--  #content  -->
+
+<div id="breadcrumbs">
+<p><a href="http://www.paulgriffiths.net/">Home</a> <span class="bcsep">&gt;</span> <a href="http://www.paulgriffiths.net/program/">Computer programming</a> <span class="bcsep">&gt;</span> <a href="http://www.paulgriffiths.net/program/c/">C examples</a> <span class="bcsep">&gt;</span> <a href="http://www.paulgriffiths.net/program/c/sockets.php">Sockets examples</a> <span class="bcsep">&gt;</span> Simple TCP/IP web server</p>
+</div>  <!--  #breadcrumbs  -->
+
+<div id="sidebar">
+<div id="navmenu">
+<h2>Navigation menu</h2>
+<ul>
+  <li><a href="http://www.paulgriffiths.net/">Home</a></li>
+  <li><a href="http://www.paulgriffiths.net/sitemap.php">Site map</a></li>
+  <li><a href="http://www.paulgriffiths.net/program/">Programming</a></li>
+  <li><a href="http://www.paulgriffiths.net/web/">Web development</a></li>
+  <li><a href="http://www.paulgriffiths.net/aboutme.php">About me</a></li>
+  <li><a href="http://www.paulgriffiths.net/blog/">Blog</a></li>
+</ul>
+</div>  <!--  #navmenu  -->
+<div id="googlesearch">
+<h2>Search this site</h2>
+<!-- SiteSearch Google -->
+<form method="get" action="http://www.paulgriffiths.net/searchresults.php">
+<table>
+<tbody><tr><td style="white-space: nowrap; vertical-align: top; text-align: left; height: 32px;">
+<a href="http://www.google.com/">
+<img src="webserv.php_files/Logo_25wht.gif" style="border: 0px none; text-align: center;" alt="Google"></a>
+<br>
+<input name="domains" value="www.paulgriffiths.net" type="hidden">
+<label for="sbi" style="display: none">Enter your search terms</label>
+<input name="q" size="16" maxlength="255" id="sbi" style="width: 125px;" type="text">
+</td></tr>
+<tr>
+<td style="white-space: nowrap; text-align: right;">
+<table>
+<tbody><tr class="searchbuttons">
+<td>
+<input name="sitesearch" value="" id="ss0" type="radio">
+<label for="ss0" title="Search the Web" style="font-size: 0.6em; color: #000;">Web</label></td>
+<td>
+<input name="sitesearch" value="www.paulgriffiths.net" checked="checked" id="ss1" type="radio">
+<label for="ss1" title="Search www.paulgriffiths.net" style="font-size: 0.6em; color: #000;">www.paulgriffiths.net</label></td>
+</tr>
+</tbody></table>
+<label for="sbb" style="display: none">Submit search form</label>
+<input name="sa" value="Search" id="sbb" type="submit">
+<input name="client" value="pub-2084314927813794" type="hidden">
+<input name="forid" value="1" type="hidden">
+<input name="ie" value="ISO-8859-1" type="hidden">
+<input name="oe" value="ISO-8859-1" type="hidden">
+<input name="cof" value="GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:336699;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;FORID:11" type="hidden">
+<input name="hl" value="en" type="hidden">
+</td></tr></tbody></table>
+</form>
+<!-- SiteSearch Google -->
+</div>  <!--  #googlesearch  -->
+<div id="validity">
+<h2>Conformance</h2>
+<ul>
+  <li><a href="http://validator.w3.org/check?uri=referer">Valid XHTML1.0</a></li>
+  <li><a href="http://jigsaw.w3.org/css-validator/check/referer?warning=2&amp;profile=css3&amp;usermedium=all">Valid CSS3</a></li>
+</ul>
+</div>  <!--  #validity  -->
+<div id="googleads">
+<h2>Ads</h2>
+<div id="googleadcontent">
+<script type="text/javascript"><!--
+google_ad_client = "pub-2084314927813794";
+google_ad_width = 160;
+google_ad_height = 600;
+google_ad_format = "160x600_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "FFFFFF";
+google_color_bg = "FFFFFF";
+google_color_link = "bb6f02";
+google_color_text = "000000";
+google_color_url = "008000";
+google_ui_features = "rc:6";
+//-->
+</script>
+<script type="text/javascript" src="webserv.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:600px;margin:0;padding:0;position:relative;visibility:visible;width:160px"><ins id="aswift_0_anchor" style="display:block;border:none;height:600px;margin:0;padding:0;position:relative;visibility:visible;width:160px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0px; position: absolute; top: 0px;" frameborder="0" height="600" scrolling="no" width="160"></iframe></ins></ins>
+</div>  <!--  #googleadcontent  -->
+</div>  <!--  #googleads  -->
+</div>  <!--  #sidebar  -->
+</div>  <!--  #main  -->
+
+
+
+
+
+
+</body></html>

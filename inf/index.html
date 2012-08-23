@@ -1,0 +1,806 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>nweb: a tiny, safe Web server (static pages only)</title>
+<meta http-equiv="PICS-Label" content="(PICS-1.1 &quot;http://www.icra.org/ratingsv02.html&quot; l gen true r (cz 1 lz 1 nz 1 oz 1 vz 1) &quot;http://www.rsac.org/ratingsv01.html&quot; l gen true r (n 0 s 0 v 0 l 0) &quot;http://www.classify.org/safesurf/&quot; l gen true r (SS~~000 1))">
+<link rel="schema.DC" href="http://purl.org/DC/elements/1.0/">
+<link rel="SHORTCUT ICON" href="http://www.ibm.com/favicon.ico">
+<meta name="Owner" content="developerWorks Content/Raleigh/IBM">
+<meta name="DC.Language" scheme="rfc1766" content="en">
+<meta name="IBM.Country" content="ZZ">
+<meta name="Security" content="Public">
+<meta name="IBM.SpecialPurpose" content="SP001">
+<meta name="IBM.PageAttributes" content="sid=1003">
+<meta name="Source" content="v16 Template Generator">
+<meta name="Robots" content="index,follow">
+<meta name="Abstract" content="Have you ever wondered how a Web server actually works? Experiment with nweb -- a simple Web server with only 200 lines of C source code. In this article, Nigel Griffiths provides a copy of this Web server and includes the source code as well. You can see exactly what it can and can't do.">
+<meta name="Description" content="Have you ever wondered how a Web server actually works? Experiment with nweb -- a simple Web server with only 200 lines of C source code. In this article, Nigel Griffiths provides a copy of this Web server and includes the source code as well. You can see exactly what it can and can't do.">
+<meta name="Keywords" content="nweb, web, server, source, code, safe, dddauca">
+<meta name="DC.Date" scheme="iso8601" content="2006-09-25">
+<meta name="DC.Type" scheme="IBM_ContentClassTaxonomy" content="CT316">
+<meta name="DC.Subject" scheme="IBM_SubjectTaxonomy" content="SWG10">
+<meta scheme="IBM_WTMCategory" name="IBM.WTMCategory" content="SOFDCAIXZZ">
+<meta name="DC.Rights" content="© Copyright&nbsp;IBM Corporation&nbsp;2004,&nbsp;2006">
+<meta name="IBM.Effective" scheme="W3CDTF" content="2004-06-10">
+<meta name="title" content="nweb: a tiny, safe Web server (static pages only)">
+
+<!-- HEADER_SCRIPTS_AND_CSS_INCLUDE -->
+<link href="index_files/all.css" media="all" rel="stylesheet" title="www" type="text/css">
+<link href="index_files/screen.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+<link href="index_files/screen-uas.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+<link href="index_files/screen-fonts.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+<link href="index_files/handheld.css" media="handheld" rel="stylesheet" title="www" type="text/css">
+<link href="index_files/print.css" media="print" rel="stylesheet" title="www" type="text/css">
+<link href="index_files/overlay.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+
+<!-- dW-specific CSS -->
+<link href="index_files/dw-screen.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+<link href="index_files/jquery.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+
+<script src="index_files/ibmcommon.js" type="text/javascript">//</script><link title="IBM Search" href="http://www.ibm.com/search/opensearch/description.xml" type="application/opensearchdescription+xml" rel="search">
+<script src="index_files/dynamicnav.js" type="text/javascript">//</script>
+
+<!-- dW functional JS -->
+<script language="JavaScript" src="index_files/urltactic.js" type="text/javascript"></script>
+<!-- Rating_START -->
+<script language="JavaScript" src="index_files/artrating.js" type="text/javascript"></script>
+<style type="text/css">
+.metavalue {
+  display: none;
+}
+</style>
+<!-- Rating_END --><!-- RESERVED_HEADER_INCLUDE -->
+<script language="javascript" src="index_files/ajax1.js" type="text/javascript"></script>
+<script language="javascript" src="index_files/search_counter-maverick.js" type="text/javascript"></script>
+<script language="javascript" src="index_files/request_referer_capture-maverick.js" type="text/javascript"></script>
+<script language="JavaScript" type="text/javascript">
+ <!--
+ setDefaultQuery('systemsart');
+ //-->
+</script>
+<script language="JavaScript" type="text/javascript">
+ <!--
+ function openNewWindow(url,tar,arg){window.open(url,tar,arg);}
+ //-->
+</script>
+<script charset="UTF-8" src="index_files/flash-detect.js" type="text/javascript" id="flashdetect"></script><script charset="UTF-8" src="index_files/usen-utf8.js" type="text/javascript" id="mhMenu"></script><script charset="UTF-8" src="index_files/Controller_002" type="text/javascript" id="dynavEA"></script><script charset="UTF-8" src="index_files/Controller" type="text/javascript" id="wiBundle"></script></head>
+
+<body id="ibm-com">
+<div id="ibm-top" class="ibm-landing-page">
+
+<!-- MASTHEAD_BEGIN -->
+<div class="ibm-access"><a href="#ibm-content">Skip to main content</a></div>
+<div id="ibm-masthead">
+<div id="ibm-logo"><a href="http://www.ibm.com/"><img src="index_files/ibm-logo.gif" alt="IBM®" height="50" width="110"></a></div>
+<ul id="ibm-geo"><li id="ibm-country" class="ibm-first">Country/region</li><li id="ibm-change-country">[ <a href="http://www.ibm.com/developerworks/country/">select</a> ]</li></ul>
+  <form id="ibm-search-form" action="//www.ibm.com/developerworks/search/searchResults.jsp" method="get" name="form1"><input name="searchType" value="1" type="hidden"><input name="searchSite" value="dW" type="hidden"><p>
+<span id="ibm-search-scope">
+<label for="sn"><img src="index_files/c.gif" alt="Search in:" height="1" width="1"></label>
+<select name="searchScope" id="sn">
+<option value="dW" selected="selected">All of dW</option>
+<option value="dW">-----------------</option>
+<option value="aixunix">&nbsp;AIX and UNIX</option>
+<option value="db2">&nbsp;Information Mgmt</option>
+<option value="lotus">&nbsp;Lotus</option>
+<option value="rdd">&nbsp;Rational</option>
+<option value="tivoli">&nbsp;Tivoli</option>  
+<option value="WSDD">&nbsp;WebSphere</option>
+<option value="dW">-----------------</option> 
+<option value="javaZ">&nbsp;Java technology</option> 
+<option value="linuxZ">&nbsp;Linux</option> 
+<option value="opensrcZ">&nbsp;Open source</option>
+<option value="webservZ">&nbsp;SOA/Web services</option>
+<option value="webarchZ">&nbsp;Web development</option>  
+<option value="xmlZ">&nbsp;XML</option>
+<option value="dW">-----------------</option>
+<option value="forums">&nbsp;dW forums</option> 
+<option value="dW">-----------------</option>
+<option value="aI">University</option>
+<option value="dW">-----------------</option>
+<option value="aW">alphaWorks</option>
+<option value="dW">-----------------</option>
+<option value="all">All of IBM</option>
+</select>
+</span>
+
+<label for="q"><img alt="Search for:" src="index_files/c.gif" height="1" width="1"></label><input name="query" maxlength="100" id="q" type="text"><input id="ibm-search" class="ibm-btn-search" name="Search" value="Search" type="submit"></p></form>
+<div id="ibm-site-name">
+<!-- IBM site name container -->
+</div>
+<div id="ibm-universal-nav">
+<ul><li id="ibm-unav-home" class="ibm-first"><a href="http://www.ibm.com/us/en/">Home</a></li><li style="z-index: 8;" class=" ibm-is-active ibm-is-active" id="ibm-unav-solutions"><a class=" ibm-unav-has-child" href="http://www.ibm.com/solutions/us/en/">Solutions</a><div style="display: none; z-index: 9; left: 0px;" id="gi-d7520f78" class="ibm-unav-menu"><span style="display: none; height: 4606px;" id="gi-d7520f78-ehb" class="ibm-unav-menu-ehb ibm-is-active"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li class=" ibm-mhdyn-rule"><a id="gi-a67542e4-trigger" href="http://www.ibm.com/smarterplanet/us/en/?cm_re=masthead-_-solutions-_-asmarterplanet">A smarter planet</a><div id="gi-a67542e4" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-a67542e4-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-5e41111-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">By industry</a><div id="gi-5e41111" class="ibm-unav-menu ibm-place-holder"><span id="gi-5e41111-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/industries/aerodefense/?cm_re=masthead-_-business-_-ind-aerodef">Aerospace and defense</a></li><li><a href="http://www.ibm.com/industries/automotive/?cm_re=masthead-_-business-_-ind-auto">Automotive</a></li><li><a href="http://www.ibm.com/industries/financialservices/banking/?cm_re=masthead-_-business-_-ind-banking">Banking</a></li><li><a href="http://www.ibm.com/industries/chemicalspetroleum/?cm_re=masthead-_-business-_-ind-chem">Chemicals and petroleum</a></li><li><a href="http://www.ibm.com/industries/consumerproducts/?cm_re=masthead-_-business-_-ind-consumer">Consumer products</a></li><li><a href="http://www.ibm.com/industries/education/?cm_re=masthead-_-business-_-ind-edu">Education</a></li><li><a href="http://www.ibm.com/industries/electronics/?cm_re=masthead-_-business-_-ind-elec">Electronics</a></li><li><a href="http://www.ibm.com/industries/utilities/?cm_re=masthead-_-business-_-ind-energy">Energy and utilities</a></li><li><a href="http://www.ibm.com/industries/financialservices/financialmarkets/?cm_re=masthead-_-business-_-ind-finance">Financial markets</a></li><li><a href="http://www.ibm.com/industries/government/?cm_re=masthead-_-business-_-ind-gov">Government</a></li><li><a href="http://www.ibm.com/industries/healthcare/?cm_re=masthead-_-solutions-_-ind-health">Healthcare</a></li><li><a href="http://www.ibm.com/industries/financialservices/insurance/?cm_re=masthead-_-business-_-ind-ins">Insurance</a></li><li><a href="http://www.ibm.com/services/gbs/lifesciences?cm_re=masthead-_-solutions-_-ind-lifesci">Life sciences</a></li><li><a href="http://www.ibm.com/industries/media/?cm_re=masthead-_-business-_-ind-media">Media and entertainment</a></li><li><a href="http://www.ibm.com/industries/metalsmining/?cm_re=masthead-_-solutions-_-ind-metalsmining">Metals and mining</a></li><li><a href="http://www.ibm.com/industries/retail/?cm_re=masthead-_-business-_-ind-retail">Retail</a></li><li><a href="http://www.ibm.com/industries/telecom/?cm_re=masthead-_-business-_-ind-tele">Telecommunications</a></li><li><a href="http://www.ibm.com/industries/travel/?cm_re=masthead-_-business-_-ind-travel">Travel and transportation</a></li></ul></div></li><li class=" ibm-place-holder"><a style="z-index: 8;" id="gi-b3dc0a02-trigger" class=" ibm-unav-menu-has-child " href="javascript:void(0);">By business need</a><div style="z-index: 9; top: 523px; left: 83px; display: none;" id="gi-b3dc0a02" class="ibm-unav-menu ibm-place-holder"><span style="display: none; height: 128px;" id="gi-b3dc0a02-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/bao?cm_re=masthead-_-business-_-bzn-bao">Business analytics and optimization</a></li><li><a href="http://www.ibm.com/software/products/us/en/category/SWQ00?cm_re=masthead-_-business-_-bzn-busint">Business intelligence</a></li><li><a href="http://www.ibm.com/software/products/us/en/category/SWX00?cm_re=masthead-_-business-_-emm">Enterprise marketing management</a></li><li><a href="http://www.ibm.com/solutions/erp/?cm_re=masthead-_-business-_-bzn-erp">Enterprise resource planning</a></li><li><a href="http://www.ibm.com/software/plm/?cm_re=masthead-_-business-_-bzn-plm">Product lifecycle management</a></li><li><a href="http://www.ibm.com/security/?cm_re=masthead-_-business-_-bzn-sec">Security</a></li><li><a href="http://www.ibm.com/services/us/gbs/bus/html/bcs_strategyplanning.html?re=bcs_home&amp;cm_re=masthead-_-business-_-bzn-strat">Strategy and change</a></li></ul></div></li><li class=" ibm-place-holder"><a id="gi-d2923755-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">By IT issue</a><div id="gi-d2923755" class="ibm-unav-menu ibm-place-holder"><span id="gi-d2923755-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/software/products/us/en/category/SW600?cm_re=masthead-_-business-_-bzn-eai">Application infrastructure</a></li><li><a href="http://www.ibm.com/software/products/us/en/category/SW444?cm_re=masthead-_-business-_-bzn-bpa">Business planning and alignment</a></li><li><a href="http://www.ibm.com/software/products/us/en/category/bpm-software?cm_re=masthead-_-business-_-bzn-bpm">Business process management</a></li><li><a href="http://www.ibm.com/software/products/us/en/category/SWH00?cm_re=masthead-_-business-_-bzn-comm">Commerce</a></li><li><a href="http://www.ibm.com/software/products/us/en/category/SW666?cm_re=masthead-_-business-_-bzn-conn">Connectivity and integration</a></li><li><a href="http://www.ibm.com/software/products/us/en/category/SWB00?cm_re=masthead-_-business-_-bzn-data">Data management</a></li><li><a href="http://www.ibm.com/software/products/us/en/category/SWN00?cm_re=masthead-_-business-_-bzn-content">Enterprise content management</a></li><li><a href="http://www.ibm.com/software/products/us/en/category/SWP20?cm_re=masthead-_-business-_-infogov">Information governance</a></li><li><a href="http://www.ibm.com/itsolutions/compliance/?cm_re=masthead-_-business-_-bzn-compliance">Regulatory compliance</a></li><li><a href="http://www.ibm.com/security?cm_re=masthead-_-business-_-bzn-security">Security</a></li><li><a href="http://www.ibm.com/software/products/us/en/category/SWD00?cm_re=masthead-_-business-_-bzn-collab">Social collaboration</a></li><li><a href="http://www.ibm.com/systems/virtualization/?cm_re=masthead-_-business-_-bzn-virtual">Virtualization</a></li><li><a href="http://www.ibm.com/software/products/us/en/category/SWS00?cm_re=masthead-_-business-_-bzn-wrkforce">Web experience</a></li></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-632a2a9b-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">By Business Partner</a><div id="gi-632a2a9b" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-632a2a9b-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/solutions/cisco/us/en/?cm_re=masthead-_-business-_-bp-cisco">IBM and Cisco</a></li><li><a href="http://www.ibm.com/solutions/3ds/us/en/?cm_re=masthead-_-business-_-bp-ds">IBM and Dassault Systèmes</a></li><li><a href="http://www.ibm.com/solutions/oracle/us/en/?cm_re=masthead-_-business-_-bp-oracle">IBM and Oracle</a></li><li><a href="http://www.ibm.com/solutions/sap/us/en/?cm_re=masthead-_-business-_-bp-sap">IBM and SAP</a></li><li><a href="http://www.ibm.com/solutions/alliance/us/en/?cm_re=masthead-_-business-_-bp-more">More Alliance Partners</a></li><li class=" ibm-mhdyn-rule"><a id="gi-35f0296c-trigger" href="http://www.ibm.com/software/showcase?cm_re=masthead-_-business-_-bp-select">Business Partner solutions</a><div id="gi-35f0296c" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-35f0296c-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li><a href="http://www.ibm.com/partnerworld/wps/bplocator/?cm_re=masthead-_-business-_-bp-loc">Find a Business Partner</a></li></ul></div></li><li><a href="http://www.ibm.com/services/us/gbs/consulting/?cm_re=masthead-_-business-_-busconsult">Business consulting</a></li><li><a href="http://www.ibm.com/cloud?cm_re=masthead-_-solutions-_-cloud">Cloud computing</a></li><li><a href="http://www.ibm.com/green/?cm_re=masthead-_-business-_-green">Energy &amp; environment</a></li><li><a href="http://www.ibm.com/financing/us/?cm_re=masthead-_-business-_-financing">Financing</a></li><li><a href="http://www.ibm.com/soa?pgel=ibmhzn&amp;cm_re=masthead-_-business-_-soa">Service oriented architecture (SOA)</a></li><li class=" ibm-mhdyn-rule"><a id="gi-390b3286-trigger" href="http://www.ibm.com/smartercomputing/?cm_re=masthead-_-business-_-di">Smarter computing</a><div id="gi-390b3286" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-390b3286-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-66c75787-trigger" href="http://www.ibm.com/finder/businesscenter/us/en/itsolutionsservices_topic.wss?cm_re=masthead-_-business-_-sol4mb">Small and medium business</a><div id="gi-66c75787" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-66c75787-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li><a href="http://www.ibm.com/businesssolutions/us/en/?cm_re=masthead-_-business-_-more">More</a></li></ul></div></li><li id="ibm-unav-services"><a class=" ibm-unav-has-child" href="http://www.ibm.com/technologyservices/us/en/">Services</a><div id="gi-51845fe0" class="ibm-unav-menu"><span id="gi-51845fe0-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li class=" ibm-mhdyn-rule"><a id="gi-32bab4a8-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">IT services</a><div id="gi-32bab4a8" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-32bab4a8-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/services/us/index.wss">All IT services</a></li><li><a href="http://www.ibm.com/services/continuity/?cm_re=masthead-_-itservices-_-buscont">Business continuity and resiliency services</a></li><li><a href="http://www.ibm.com/services/us/en/it-services/data-center-services1.html">Data center services</a></li><li><a href="http://www.ibm.com/services/integratedcommunications/?cm_re=masthead-_-itservices-_-communications">Integrated communications services</a></li><li><a href="http://www.ibm.com/services/maintenance/?cm_re=masthead-_-itservices-_-maint">Technical support services</a></li><li><a href="http://www.ibm.com/services/security/?cm_re=masthead-_-itservices-_-security">Security services</a></li><li><a href="http://www.ibm.com/services/itsaconsulting/?cm_re=masthead-_-itservices-_-strategy">Strategy and design services</a></li><li><a href="http://www.ibm.com/services/enduser/?cm_re=masthead-_-itservices-_-enduser">Workplace services</a></li><li><a href="http://www.ibm.com/services/us/index.wss/allservices">IT services A-Z</a></li></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-3fe88849-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">Business consulting</a><div id="gi-3fe88849" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-3fe88849-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/services/us/gbs/consulting/?cm_re=masthead-_-itservices-_-busconsult">Global Business Services</a></li><li><a href="http://www.ibm.com/gbs/bao?cm_re=masthead-_-itservices-_-bao">Business analytics</a></li><li><a href="http://www.ibm.com/services/us/gbs/strategy?cm_re=masthead-_-itservices-_-strategytransform">Business strategy</a></li><li><a href="http://www.ibm.com/services/us/gbs/bus/html/bcs_whatwethink.html?cm_re=masthead-_-itservices-_-thoughtleader">Thought leadership</a></li></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-4beacaad-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">Application services</a><div id="gi-4beacaad" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-4beacaad-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/services/applications?cm_re=masthead-_-business-_-apps-allappserv">All application services</a></li><li><a href="http://www.ibm.com/services/us/gbs/app/html/gbs_app_custom_appdev_sysinteg.html?cm_re=masthead-_-business-_-apps-appdev">Custom application development and system integration</a></li><li><a href="http://www.ibm.com/services/ams?cm_re=masthead-_-business-_-apps-appmgmt">Application management</a></li></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-e76d1e63-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">Outsourcing services</a><div id="gi-e76d1e63" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-e76d1e63-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/services/us/index.wss/offerfamily/aod/a1028600">Applications outsourcing</a></li><li><a href="http://www.ibm.com/services/us/index.wss/offerfamily/igs/a1001429">Business process outsourcing</a></li><li><a href="http://www.ibm.com/services/us/index.wss/offerfamily/gts/a1029385">IT outsourcing and hosting</a></li></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-13be7c49-trigger" href="http://www.ibm.com/training">Training</a><div id="gi-13be7c49" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-13be7c49-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-e8ec400-trigger" href="http://www-01.ibm.com/finder/businesscenter/us/en/itsolutionsservices_topic.wss?cm_re=masthead-_-itservices-_-medbus">Small and medium business</a><div id="gi-e8ec400" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-e8ec400-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-d8660762-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">Other services</a><div id="gi-d8660762" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-d8660762-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/financing/us/recovery/?cm_re=masthead-_-itservices-_-asset">Asset recovery</a></li><li><a href="http://www.ibm.com/services/us/gbs/alliances/?cm_re=masthead-_-itservices-_-conall">Consulting alliances</a></li><li><a href="http://www.ibm.com/software/sw-services/?cm_re=masthead-_-itservices-_-software">Software services</a></li><li><a href="http://www.ibm.com/systems/services/labservices/?cm_re=masthead-_-itservices-_-syslab">Systems lab services</a></li></ul></div></li><li><a href="http://www.ibm.com/technologyservices/us/en/?cm_re=masthead-_-itservices-_-more">More</a></li></ul></div></li><li id="ibm-unav-products"><a class=" ibm-unav-has-child" href="http://www.ibm.com/products/us/en/">Products</a><div id="gi-bf6722a6" class="ibm-unav-menu"><span id="gi-bf6722a6-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li class=" ibm-place-holder"><a id="gi-c5f31c25-trigger" href="http://www.ibm.com/products/specialoffers/us/en/index.html?cm_re=masthead-_-products-_-promo">Special offers</a><div id="gi-c5f31c25" class="ibm-unav-menu ibm-place-holder"><span id="gi-c5f31c25-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-1afcf6ee-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">Software</a><div id="gi-1afcf6ee" class="ibm-unav-menu ibm-place-holder"><span id="gi-1afcf6ee-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/software?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-allsoftware">Software overview</a></li><li><a href="http://www.ibm.com/software/products/us/en/?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-swprodfinder">Products</a></li><li><a href="http://www14.software.ibm.com/webapp/download/byproduct.jsp?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-trials">Trials and demos</a></li><li class=" ibm-mhdyn-rule"><a id="gi-7e3a1f52-trigger" href="http://www.ibm.com/software/sw-events/?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-swevents">Events and conferences</a><div id="gi-7e3a1f52" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-7e3a1f52-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li><a href="http://www.ibm.com/software/products/us/en/category/SWQ00?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-bizanalytics">Business Analytics</a></li><li><a href="http://www.ibm.com/software/data/cognos/?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-cognos">- Cognos</a></li><li><a href="http://www.ibm.com/software/analytics/spss/?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-spss">- SPSS</a></li><li><a href="http://www.ibm.com/software/data/content-management/?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-ecm">Enterprise Content Management</a></li><li><a href="http://www.ibm.com/software/data?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-infomgmt">Information Management</a></li><li><a href="http://www.ibm.com/software/data/management/?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-db2">- DB2</a></li><li><a href="http://www.ibm.com/software/data/informix/?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-informix">- Informix</a></li><li><a href="http://www.ibm.com/software/data/infosphere/?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-infosphere">- InfoSphere</a></li><li><a href="http://www.ibm.com/software/lotus?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-lotus">Lotus</a></li><li><a href="http://www.ibm.com/software/rational?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-rational">Rational</a></li><li><a href="http://www.ibm.com/software/tivoli?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-tivoli">Tivoli</a></li><li><a href="http://www.ibm.com/software/websphere?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-websphere">WebSphere</a></li><li><a href="http://www.ibm.com/software/os/systemz/en_US/?pgel=ibmhzn&amp;cm_re=masthead-_-products-_-sw-sysz">System z software</a></li></ul></div></li><li class=" ibm-place-holder"><a id="gi-e8b28bc4-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">Storage</a><div id="gi-e8b28bc4" class="ibm-unav-menu ibm-place-holder"><span id="gi-e8b28bc4-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/storage/?cm_re=masthead-_-products-_-stg-allstorage">All storage</a></li><li><a href="http://www.ibm.com/storage/disk/?cm_re=masthead-_-products-_-stg-disk">Disk systems</a></li><li><a href="http://www.ibm.com/storage/tape/?cm_re=masthead-_-products-_-stg-tape">Tape systems</a></li><li><a href="http://www.ibm.com/storage/snetwork/?cm_re=masthead-_-products-_-stg-san">Storage area networks</a></li><li><a href="http://www.ibm.com/totalstorage/nas/?cm_re=masthead-_-products-_-stg-nas">Network attached storage</a></li><li><a href="http://www.ibm.com/storage/software/?cm_re=masthead-_-products-_-stg-storagesoft">Storage software</a></li><li><a href="http://www.ibm.com/pc/ww/hdd/hddredirect.html?cm_re=masthead-_-products-_-stg-hdd">Hard drives/microdrives</a></li><li><a href="http://www.ibm.com/systems/storage/product/?cm_re=masthead-_-products-_-stg-storagea2z">Storage A to Z</a></li></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-415de80a-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">Servers &amp; systems</a><div id="gi-415de80a" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-415de80a-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/systems/?cm_re=masthead-_-products-_-sys-allsystems">All servers and systems</a></li><li><a href="http://www.ibm.com/systems/software/?cm_re=masthead-_-products-_-sys-syssw">Systems software</a></li><li><a href="http://www.ibm.com/systems/power/?cm_re=masthead-_-products-_-sys-power">Power Systems (AIX, IBM i, Linux)</a></li><li><a href="http://www.ibm.com/systems/z/?cm_re=masthead-_-products-_-sys-zseries">System z (Mainframe)</a></li><li><a href="http://www.ibm.com/systems/x/?cm_re=masthead-_-products-_-sys-xseries">System x (xSeries)</a></li><li><a href="http://www.ibm.com/systems/bladecenter/?cm_re=masthead-_-products-_-sys-blade">BladeCenter</a></li><li class=" ibm-mhdyn-rule"><a id="gi-1c861379-trigger" href="http://www.ibm.com/systems/clusters/?cm_re=masthead-_-products-_-sys-cluster">Cluster systems</a><div id="gi-1c861379" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-1c861379-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li><a href="http://www.ibm.com/systems/hardware/browse/unix/?cm_re=masthead-_-products-_-sys-unix">UNIX servers</a></li><li class=" ibm-mhdyn-rule"><a id="gi-3d288ea0-trigger" href="http://www.ibm.com/systems/hardware/browse/linux/?cm_re=masthead-_-products-_-sys-linux">Linux servers</a><div id="gi-3d288ea0" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-3d288ea0-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li><a href="http://www.ibm.com/systems/hardware/browse/intelpro/?cm_re=masthead-_-products-_-sys-intel">Intel processor-based servers</a></li><li class=" ibm-mhdyn-rule"><a id="gi-c21a8fd3-trigger" href="http://www.ibm.com/systems/hardware/browse/amdpro/?cm_re=masthead-_-products-_-sys-amd">AMD processor-based servers</a><div id="gi-c21a8fd3" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-c21a8fd3-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li><a href="http://www.ibm.com/systems/oem?cm_re=masthead-_-products-_-oemsys">OEM systems</a></li></ul></div></li><li class=" ibm-place-holder"><a id="gi-406922e0-trigger" href="http://www.ibm.com/software/tivoli/solutions/security/?cm_re=masthead-_-products-_-iss">Internet security</a><div id="gi-406922e0" class="ibm-unav-menu ibm-place-holder"><span id="gi-406922e0-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-16b749e8-trigger" href="http://www.ibm.com/systems/networking/?cm_re=masthead-_-products-_-networking">Networking</a><div id="gi-16b749e8" class="ibm-unav-menu ibm-place-holder"><span id="gi-16b749e8-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-ab758b2-trigger" href="http://www.ibm.com/shop/usedpcs">Personal computers</a><div id="gi-ab758b2" class="ibm-unav-menu ibm-place-holder"><span id="gi-ab758b2-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-3cd6fc3e-trigger" href="http://www.ibm.com/products/retail/?cm_re=masthead-_-products-_-pos">Point of sale</a><div id="gi-3cd6fc3e" class="ibm-unav-menu ibm-place-holder"><span id="gi-3cd6fc3e-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-6d7b848f-trigger" href="http://www.infoprint.com/us">Printing systems from InfoPrint</a><div id="gi-6d7b848f" class="ibm-unav-menu ibm-place-holder"><span id="gi-6d7b848f-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-67bf322b-trigger" href="http://www.ibm.com/technology/?cm_re=masthead-_-products-_-chips">Semiconductors</a><div id="gi-67bf322b" class="ibm-unav-menu ibm-place-holder"><span id="gi-67bf322b-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-b22a7780-trigger" href="http://www.ibm.com/shop/americas/content/home/store_IBMPublicUSA/en_US/Upgrades.html?cm_re=masthead-_-products-_-upgrades">Upgrades, accessories &amp; parts</a><div id="gi-b22a7780" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-b22a7780-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-e82b88cc-trigger" href="http://www.ibm.com/shop/usedsystems">Certified used servers &amp; storage</a><div id="gi-e82b88cc" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-e82b88cc-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-508a117e-trigger" href="http://www.ibm.com/community/?cm_re=masthead-_-products-_-promo">Communities</a><div id="gi-508a117e" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-508a117e-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-5b9fc5b2-trigger" href="http://www.ibm.com/businesscenter/smb/us/en/smallbusiness?cm_re=masthead-_-products-_-smallbus">Small business products</a><div id="gi-5b9fc5b2" class="ibm-unav-menu ibm-place-holder"><span id="gi-5b9fc5b2-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-17cc9a85-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">Medium business products</a><div id="gi-17cc9a85" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-17cc9a85-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/finder/businesscenter/us/en/hardware_topic.wss?cm_re=masthead-_-products-_-med-hardware">Hardware</a></li><li><a href="http://www.ibm.com/finder/businesscenter/us/en/software_topic.wss?cm_re=masthead-_-products-_-med-software">Software</a></li></ul></div></li><li class=" ibm-place-holder"><a id="gi-d1aefb30-trigger" href="http://www.ibm.com/products/us/?cm_re=masthead-_-products-_-more">More</a><div id="gi-d1aefb30" class="ibm-unav-menu ibm-place-holder"><span id="gi-d1aefb30-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li></ul></div></li><li id="ibm-unav-support"><a class=" ibm-unav-has-child" href="http://www.ibm.com/support/entry/portal/Overview/">Support &amp; downloads</a><div id="gi-39e3f03" class="ibm-unav-menu"><span id="gi-39e3f03-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li class=" ibm-place-holder"><a id="gi-e4b52a4a-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">Download</a><div id="gi-e4b52a4a" class="ibm-unav-menu ibm-place-holder"><span id="gi-e4b52a4a-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://www.ibm.com/support/entry/portal/us/Downloads?cm_re=other-_-suprcn-_-download">Fixes, updates and drivers</a></li><li><a href="http://www14.software.ibm.com/webapp/download/byproduct.jsp?pgel=ibmhzn1&amp;cm_re=masthead-_-supdl-_-dl-trials">Trials and demos</a></li></ul></div></li><li class=" ibm-place-holder"><a id="gi-1c2134f7-trigger" href="http://www.ibm.com/support/entry/portal/Troubleshooting">Troubleshoot</a><div id="gi-1c2134f7" class="ibm-unav-menu ibm-place-holder"><span id="gi-1c2134f7-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-1964188a-trigger" href="http://www.ibm.com/support/entry/portal/search">Search</a><div id="gi-1964188a" class="ibm-unav-menu ibm-place-holder"><span id="gi-1964188a-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-da8a6d5d-trigger" href="http://www.ibm.com/support/entry/portal/Documentation">Documentation</a><div id="gi-da8a6d5d" class="ibm-unav-menu ibm-place-holder"><span id="gi-da8a6d5d-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-e15b4d14-trigger" href="http://www.ibm.com/support/entry/portal/Forums_communities">Communities</a><div id="gi-e15b4d14" class="ibm-unav-menu ibm-place-holder"><span id="gi-e15b4d14-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-94d9db78-trigger" href="http://www.ibm.com/support/entry/portal/Planning">Plan</a><div id="gi-94d9db78" class="ibm-unav-menu ibm-place-holder"><span id="gi-94d9db78-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-140e6869-trigger" href="http://www.ibm.com/support/entry/portal/Installation">Install</a><div id="gi-140e6869" class="ibm-unav-menu ibm-place-holder"><span id="gi-140e6869-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-b746aa01-trigger" href="http://www.ibm.com/support/entry/portal/Usage">Use</a><div id="gi-b746aa01" class="ibm-unav-menu ibm-place-holder"><span id="gi-b746aa01-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-c5bc4c7c-trigger" href="http://www.ibm.com/support/electronic/uprtransition.wss?category=2&amp;locale=en_us&amp;cm_re=masthead-_-supdl-_-request">Open a technical service request</a><div id="gi-c5bc4c7c" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-c5bc4c7c-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-f2a8f33e-trigger" href="http://www.ibm.com/support/operations/us/en?cm_re=masthead-_-supdl-_-oimore">Customer support</a><div id="gi-f2a8f33e" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-f2a8f33e-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-f96cc686-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0);">Former IBM products</a><div id="gi-f96cc686" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-f96cc686-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="http://infoprint.com/internet/ipww.nsf/vwWebPublished/sup_support_en?opendocument&amp;cm_re=masthead-_-supdl-_-sbp-print">Printing systems from InfoPrint</a></li><li><a href="http://www.lenovo.com/support/?cm_re=masthead-_-supdl-_-sbp-lenovo">Lenovo ThinkPads and ThinkCentres</a></li></ul></div></li><li class=" ibm-place-holder"><a id="gi-b9afc9eb-trigger" href="http://www.ibm.com/support/us/en/?cm_re=masthead-_-supdl-_-more">More</a><div id="gi-b9afc9eb" class="ibm-unav-menu ibm-place-holder"><span id="gi-b9afc9eb-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li></ul></div></li><li id="ibm-unav-myibm"><a class=" ibm-unav-has-child" href="http://www.ibm.com/account/us/en/">My IBM</a><div id="gi-9811b2b9" class="ibm-unav-menu"><span id="gi-9811b2b9-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li class=" ibm-place-holder"><a id="gi-344bb11d-trigger" href="http://www.ibm.com/account/myaccounts/us/en/?cm_re=masthead-_-myibm-_-myacct">My accounts</a><div id="gi-344bb11d" class="ibm-unav-menu ibm-place-holder"><span id="gi-344bb11d-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-6743c6be-trigger" href="https://www.ibm.com/account/myibm/profile.do?cc=us&amp;lc=&amp;cm_re=masthead-_-myibm-_-myprofile">My profile</a><div id="gi-6743c6be" class="ibm-unav-menu ibm-place-holder"><span id="gi-6743c6be-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-myinterest"><a id="gi-56a2cd1b-trigger" href="https://www.ibm.com/account/myibm/myinterestView.do?cc=us&amp;lc=en&amp;cm_re=masthead-_-myibm-_-myinterests">My interests</a><div id="gi-56a2cd1b" class="ibm-unav-menu ibm-myinterest"><span id="gi-56a2cd1b-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-ece28041-trigger" href="http://www.ibm.com/account/mycommunity/us/en/?cm_re=masthead-_-myibm-_-community">My community spaces</a><div id="gi-ece28041" class="ibm-unav-menu ibm-place-holder"><span id="gi-ece28041-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-b8656771-trigger" href="http://www.ibm.com/support/entry/myportal/Overview?lnk=mhmy&amp;cm_re=masthead-_-myibm-_-tech">My technical support</a><div id="gi-b8656771" class="ibm-unav-menu ibm-place-holder"><span id="gi-b8656771-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-7561e507-trigger" class=" ibm-unav-menu-has-child" href="javascript:void(0)">My customer support</a><div id="gi-7561e507" class="ibm-unav-menu ibm-place-holder"><span id="gi-7561e507-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul><li><a href="https://www.ibm.com/shop/americas/webapp/wcs/stores/servlet/default/OrderItemDisplay?langId=-1&amp;storeId=1&amp;catalogId=-840&amp;krypto=g3mOZ2uZQalqnkMCJkVJ1Q%3D%3D&amp;ddkey=OrderItemDisplay&amp;cm_re=masthead-_-myibm-_-cs-cart">Shopping cart</a></li><li><a href="http://www.ibm.com/support/operations/us/en/contracts?cm_re=masthead-_-myibm-_-cs-contracts">Contracts</a></li><li><a href="http://www.ibm.com/support/operations/us/en/orderdelivery?cm_re=masthead-_-myibm-_-cs-orders">Orders and delivery</a></li><li><a href="http://www.ibm.com/support/operations/us/en/inventory?cm_re=masthead-_-myibm-_-cs-inventory">Inventory and maintenance</a></li><li><a href="http://www.ibm.com/support/operations/us/en/invoicespayments?cm_re=masthead-_-myibm-_-cs-invoices">Invoices and payments</a></li><li><a href="http://www.ibm.com/support/operations/us/en/learnmore3a?cm_re=masthead-_-myibm-_-cs-self">Self-service tools</a></li><li><a href="http://www.ibm.com/support/operations/us?cm_re=masthead-_-myibm-_-cs-more">More customer support</a></li></ul></div></li><li class=" ibm-mhdyn-rule"><a id="gi-a7ae9748-trigger" href="http://www-148.ibm.com/bin/subscriptions/welcome.cgi?cl=usen&amp;cm_re=masthead-_-myibm-_-subscriptions">Subscriptions</a><div id="gi-a7ae9748" class="ibm-unav-menu ibm-mhdyn-rule"><span id="gi-a7ae9748-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li><li class=" ibm-place-holder"><a id="gi-f808078a-trigger" href="http://www.ibm.com/account/us/en/?cm_re=masthead-_-myibm-_-more">More</a><div id="gi-f808078a" class="ibm-unav-menu ibm-place-holder"><span id="gi-f808078a-ehb" class="ibm-unav-menu-ehb"><img src="index_files/c.gif" alt=""></span><a class="ibm-access"></a><ul></ul></div></li></ul></div></li></ul>
+</div>
+</div>
+<!-- MASTHEAD_END -->
+
+<div id="ibm-pcon">
+
+<!-- CONTENT_BEGIN -->
+<div id="ibm-content">
+
+<!-- Navigation_Trail_BEGIN -->
+<!-- &nbsp; -->
+      <div id="ibm-content-head"><ul id="ibm-navigation-trail"><li class="ibm-first"><a href="http://www.ibm.com/developerworks/">developerWorks</a></li><li><a href="http://www.ibm.com/developerworks/aix/">AIX and UNIX</a></li><li><a href="http://www.ibm.com/developerworks/views/aix/library.jsp">Technical library</a></li></ul></div>
+<!-- Navigation_Trail_END -->
+
+<!-- dW_Summary Area_START -->
+<div id="dw-summary-article">
+
+<div class="dw-content-head">
+<h1>nweb: a tiny, safe Web server (static pages only)</h1><p>
+</p></div>
+
+<div class="ibm-container-body ibm-two-column">
+
+<div class="ibm-column ibm-first">
+<div class="author"><a class="dwauthor" rel="#authortip1" href="#author1">Nigel Griffiths</a> (<a href="mailto:nag@uk.ibm.com?subject=nweb:%20a%20tiny,%20safe%20Web%20server%20%28static%20pages%20only%29">nag@uk.ibm.com</a>), pSeries Advanced Technical Support, London, UK, IBM</div><div style="display: none;" id="authortip1" class="dwauthor-onload-state ibm-no-print">Nigel
+ Griffiths has 20+ years UNIX experience, now works in the IBM eServer 
+Pre-Sales Technical Team in the United Kingdom and specializes in AIX 
+and Linux performance, sizing, tools, benchmarks, and Oracle RDBMS. 
+Nigel is well known in the AIX and Linux performance tuning area as the 
+author of freely available tools like "<a href="http://www.ibm.com/developerworks/eserver/articles/analyze_aix/index.html">nmon</a>"
+ for performance tuning and "ncp" for simple capacity 
+monitoring/planning. Officially, Nigel has the title Consulting Member 
+of the IT Specialist Profession but prefers the title Performance Guru!</div>
+<p></p>
+<p><b>Summary:</b>&nbsp; Have you ever wondered how a Web server 
+actually works? Experiment with nweb -- a simple Web server with only 
+200 lines of C source code. In this article, Nigel Griffiths provides a 
+copy of this Web server and includes the source code as well. You can 
+see exactly what it can and can't do.</p>
+
+<div id="dw-tag-content" class="ibm-no-print"></div><div id="dw-moretags-access" class="ibm-access"></div>
+<!-- Commented out for maintenance -->
+<p class="ibm-no-print"></p><div id="dw-tag-this" class="ibm-no-print"><a class="ibm-external-link" onclick="jQuery.launchTagThisWindow(); return false;" href="#">Tag this!</a></div><!--<div id="interestShow" class="ibm-no-print"></div>--><p></p>
+</div>
+
+<div class="ibm-column ibm-second">
+
+<p class="leading"><b>Date:</b>&nbsp; 25 Sep  2006 (Published 10 Jun 2004)
+<br><b>Level: </b>&nbsp;Introductory
+
+
+<!-- Commented out for maintenance -->
+<!-- <br /><b>Comments:</b> &nbsp; <span id="nCmts"><img alt="" src="//www.ibm.com/developerworks/i/circle-preloader.gif" height="12" width="50" /><img alt="" src="//www.ibm.com/i/gif" height="14" width="1" /></span> -->
+<!-- Rating_Area_Begin -->
+<!-- Ensure that div id is based on input id and ends with -widget -->	
+<input id="art-rating" name="ratinga" value="0" type="hidden"></p><div id="art-rating-widget"></div>
+<script language="JavaScript" type="text/javascript">
+// <![CDATA[
+   // widget div id and article id as args
+   //window.artRating.init('art-rating-widget');
+// ]]>
+</script>
+<!-- Rating_Area_End -->
+<p></p>
+</div>
+
+</div>
+</div>
+<!-- dW_Summary_Area_END -->
+
+<!-- CONTENT_BODY -->
+<div id="ibm-content-body">
+
+<!-- MAIN_COLUMN_BEGIN -->
+<div id="ibm-content-main">
+
+<!-- Related_Searches_Area -->
+<!-- Related_Searches_Area_Begin -->
+<script type="text/javascript" language="javascript">
+	     capture_referrer();
+</script>
+
+<div id="dw-related-searches-article" style="display:none">
+<div class="ibm-container ibm-alternate-two">
+<div class="ibm-container-body">
+
+<!--  START : HTML FOR ARTICLE SEARCH -->
+  <div id="article_results" style="display:block"></div>
+<!--  END : HTML FOR ARTICLE SEARCH -->
+
+</div>
+</div>
+</div>
+<!-- Related_Searches_Area_End -->
+<!-- MAIN_COLUMN_CONTAINER_BEGIN -->
+<div class="ibm-container">
+
+<!-- MAIN_COLUMN_CONTENT_BEGIN -->
+<p><a name="N10069"><span class="atitle">Introduction</span></a></p>
+            <p>Have you ever wanted to run a tiny, safe Web server 
+without worrying about using a fully blown Web server that could cause 
+security issues? Do you wonder how to write a program that accepts 
+incoming messages with a network socket? Have you ever just wanted your 
+own Web server to experiment and learn with?
+
+</p>
+            <p>Well, look no further -- nweb is what you need. This is a
+ simple Web server that has only 200 lines of C source code. It runs as a
+ regular user and can't run any server-side scripts or programs, so it 
+can't open up any special privileges or security holes. </p>
+            <p>This article covers:</p>
+
+<ul>
+                    <li>What the nweb server program offers</li>
+                    <li>Summary of C functions features in the program</li>
+                    <li>Pseudo code to aid understanding of the flow of the code</li>
+                    <li>Network socket system calls used and other system calls</li>
+                    <li>How the client side operates</li>
+                    <li>C source code</li>
+                </ul>
+     
+     
+            <p>nweb only transmits the following types of files to the browser :</p>
+
+<ul>
+                    <li>Static Web pages with extensions .html or .htm</li>
+                    <li>Graphical images such as .gif, .png, .jgp, or .jpeg</li>
+                    <li>Compressed binary files and archives such as .zip, .gz, and .tar</li>
+</ul>
+            
+            <p>If your favorite static file type is not in this list, you can simply add it in the source code and recompile to allow it.</p>
+
+
+            <p>The example file supplied includes the UNIX® source code 
+in C and a precompiled one for AIX®. The source will compile with the 
+IBM VisualAge® C compiler or the GNU C compiler, and should run 
+unchanged on AIX, Linux®, or any other UNIX version.</p>
+
+            <p>On UNIX (assuming the compiler is in your path), enter: 
+
+</p><table border="0" cellpadding="0" cellspacing="0" width="572"><tbody><tr><td class="code-outline"><pre class="displaycode">cc –O  nweb.c –o nweb</pre></td></tr></tbody></table><br>
+            <p></p>
+            <p>
+
+On Linux, add an extra parameter: 
+
+</p><table border="0" cellpadding="0" cellspacing="0" width="572"><tbody><tr><td class="code-outline"><pre class="displaycode">gcc –O  -DLINUX  nweb.c –o nweb
+
+</pre></td></tr></tbody></table><br>
+            <p></p>
+            <div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="#ibm-pcon" class="ibm-anchor-up-link">Back to top</a></p><p><a name="N100BA"><span class="atitle">Functions within nweb</span></a></p>
+            <p>There are only a few functions in the source code, explained below.</p>
+            <dl>
+                <dt><b>
+                    <code>log()</code>
+                </b></dt>
+                <dd>Logs messages to a log file. If the user requests an
+ operation from the Web server that is not allowed or can't be 
+completed, then nweb tries to inform the user directly. This is done by 
+returning a fake Web page to the user that includes the error message. 
+Since this function is only called from the child Web server process, 
+the function can (once completed) exit and the main Web server process 
+continues to allow further browser connection requests.  If this is not a
+ recoverable error, then the process is stopped.
+
+</dd>
+                <dt><b>
+                    <code>web()</code>
+                </b></dt>
+                <dd>Deals with the HTTP browser request and returns the 
+data to the browser. This function is called in a child process -- one 
+for each Web request. It also allows the main Web server process to 
+continue waiting for more connections. Checks are made to ensure the 
+request is safe and can be completed. After the checks have been made, 
+it transmits the requested static file to the browser and exits.
+
+</dd>
+                <dt><b>
+                    <code>main()</code>
+                </b></dt>
+                <dd>This is the main Web server process function. After 
+checking the command parameters, it creates a socket for incoming 
+browser requests, sits in a loop accepting requests, and starts child 
+processes to handle them. It should never end.
+
+</dd>
+            </dl>
+            <div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="#ibm-pcon" class="ibm-anchor-up-link">Back to top</a></p><p><a name="N100E4"><span class="atitle">Pseudo code</span></a></p>
+            <p>
+                <a href="#listing1">Listing 1</a> below is the pseudo code for the approximate 200 lines of source code. It should help you understand the flow of the program.
+
+</p>
+            <br><a name="listing1"><b>Listing 1. Pseudo code</b></a><br>
+            <table border="0" cellpadding="0" cellspacing="0" width="572"><tbody><tr><td class="code-outline"><pre class="displaycode">log()
+
+{
+
+outputs error, sorry or log messages to the nweb.log file
+
+if a sorry message, transmit it to the browser as a fake HTML response
+
+if error or sorry message the program is stopped
+
+}
+
+
+
+web()  - this function returns the request back to the browser
+
+{
+
+read from the socket the HTTP request
+
+check it’s a simple GET command
+
+check no parent directory requested to escape the web servers home directory
+
+if no file name given assume index.html
+
+check the file extension is valid and supported
+
+check the file is readable by opening it
+
+transmit the HTTP header to the browser
+
+transmit the file contents to the browser
+
+if LINUX sleep for one second to ensure the data arrives at the browser
+
+stop
+
+}
+
+
+
+main()
+
+{
+
+if option is "-?", output the hints and stop
+
+check the directory supplied is sensible and not a security risk
+
+become a daemon process
+
+ignore child programs (to avoid zombies when child processes stop)
+
+
+
+create a socket, bind it to a port number and start listening to the socket
+
+forever {
+
+			wait and accept incoming socket connection
+
+			fork a child process
+
+			if the child process then call the web function
+
+			else close new connection 
+
+	}
+
+}
+
+</pre></td></tr></tbody></table><br>
+            <div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="#ibm-pcon" class="ibm-anchor-up-link">Back to top</a></p><p><a name="N100FC"><span class="atitle">Socket system calls</span></a></p>
+            <p>In case you haven't come across these network socket 
+system calls before, they are explained below -- particularly how they 
+all fit together. You can also look them up in the manual or on the Web 
+-- though it can be hard to see what they do and why they make up a Web 
+server from just the source code and manual.</p>
+            <p>The <code>socket()</code>, <code>bind()</code>, <code>listen()</code>, and <code>accept()</code>
+ network system calls all work together to create a server process. They
+ set up a socket ready for use to communicate over a network when 
+combined.  A socket is:
+
+</p><ul>
+                    <li>An input and output stream -- regular pipes and files, for example.</li>
+                    <li>Remote access to or from a server -- when used over a network.</li>
+                    <li>Bidirectional -- when you read and write the same socket at both ends.</li>
+                    <li>Regular read and write functions -- used to send and receive data.</li>
+                    <li>A stream (no natural structure) -- you have to decide the protocol.</li>
+                    <li>For HTTP -- the request message and response 
+message are finished with a carriage return (CR or /r in C code) and a 
+line feed (LF and /n in C code). The URL is terminated by a space 
+character and the end of the requested file is highlighted by closing 
+the socket.  There are more complex alternatives in HTTP and many 
+optional features, but this is the simplest way to do it.</li>
+                </ul>
+            <p></p>
+            <p>
+                <a href="#figure1">Figure 1</a> below explains how they fit together: </p>
+            
+                <br><a name="figure1"><b>Figure 1.</b></a><br>
+                <img alt="" src="index_files/es-nweb.gif">
+            <br>
+            <p>The <code>socket()</code> function creates the socket and
+ returns the file descriptor, which can be used with any function that 
+uses file descriptors, such as read, write, and close. The arguments 
+tell the operating system what type of socket and communication you 
+need. </p>
+            <p>On the parameters to the <code>socket()</code> and <code>bind()</code>,
+ there are dozens of permutations and combinations. The arguments used 
+in the program are very typical for a regular general purpose socket 
+using IP; in my experience, other more complex options are rare.</p>
+            <p>The <code>bind()</code> function attaches a particular 
+port number to the socket. When a client is trying to contact your 
+server, it will use the IP address (often found by using a DNS service 
+to convert a hostname to an IP address) and the port number. The port 
+number tells the operating system which service you want on the server. 
+The details of the common port numbers on most UNIX machines are listed 
+in the <b>/etc/services</b> files. These files include standard port 
+numbers for services such as FTP (port 21), Telnet (port 23), and Web 
+servers (usually port 80). You should check the port numbers in the <b>/etc/services</b>
+ file to make sure you don't try one that is already in use. Although, 
+if you try, you should get an error message in the log file, as it is 
+normally impossible for two services to use the same port number.</p>
+            <p>The <code>listen()</code> function call tells the 
+operating system you are now ready to accept incoming requests. This is 
+the final switch that makes the socket available to local and remote 
+programs.</p>
+            <p>The <code>accept()</code> function does not return to your program until there is a socket connection request to this IP address and port number. The <code>accept()</code> function uses the file descriptor of the socket, but a new structure for the incoming connection (<code>struct sockaddr_in</code>) allows a server to check who is connecting to it. In nweb, you don't care who is connecting.</p>
+            <p>
+
+ Once the <code>accept()</code> function returns, it means that the 
+client socket file descriptor is live. If you read bytes from the 
+socket, you get characters from the client, and if you write bytes to 
+the socket, they get transmitted to the client. But it is not typical to
+ read or write the socket from the main program. Normally, you want to 
+allow multiple clients to have access to the services of your server, 
+and if this main program does a read or write operation, it could block 
+until there are characters to be read or the written characters 
+transmitted. This main program should be running the <code>accept()</code>
+ function again to allow a new connection to start. The main program 
+should start a child process that does the "talking" to the client and 
+any work it needs performed. For the main program to close the socket, 
+rerun the accept function and await the next client connection. When the
+ child process is started, it inherits the parents open sockets in order
+ to keep the socket alive.</p>
+            <div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="#ibm-pcon" class="ibm-anchor-up-link">Back to top</a></p><p><a name="N10181"><span class="atitle">Other system calls</span></a></p>
+            <dl>
+                <dt><b>
+                    <code>getenv()</code>
+                </b></dt>
+
+                <dd>A simple function for returning the shell variable values.  If you set a Korn shell variable 
+
+<code>$ export ABC=123</code>, then the getenv("ABC") function would return a pointer to a null terminated string containing 123.</dd>
+                <dt><b>
+                    <code>chdir()</code>
+                </b></dt>
+                <dd>Changes directory.</dd>
+                <dt><b>
+                    <code>fork()</code>
+                </b></dt>
+                <dd>Starts a child process. In the parent, it returns the process id (PID) of the child, and in the child, it returns zero.</dd>
+                <dt><b>
+                    <code>setpgrp()</code>
+                </b></dt>
+                <dd>Sets the process group. The effect is for this 
+process to break away from the other processes started by this user so 
+it will not be affected by what happens to the users (like logging off).</dd>
+                <dt><b>
+                    <code>signal()</code>
+                </b></dt>
+
+                <dd>Decides what happens when software interrupts arrive
+ for the process. Within the nweb.c code, the main server wants to 
+ignore the death of a child signal. Without this, the main server 
+process would have to run the wait system call for each child process, 
+or they would be forever stuck in the "zombie" state waiting for the 
+parent to call the <code>wait()</code> function. Eventually, there would
+ be too many zombie processes and the user's environment would hang, as 
+they could not create further processes.</dd>
+                <dt><b>
+                    <code>open(), read(), write()</code> and <code>close()</code>
+                </b></dt>
+
+                <dd>These are regular C library functions, but they are 
+used for reading the sockets and files sent to the client Web browsers 
+as the files and sockets are accessed by the file descriptor. The socket
+ is opened with the <code>accept()</code> function; the <code>open()</code> in the code is for opening the requested file.</dd>
+            </dl>
+            <div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="#ibm-pcon" class="ibm-anchor-up-link">Back to top</a></p><p><a name="N101DA"><span class="atitle">Client-side socket system calls</span></a></p>
+
+            <p>The <b>nweb.c</b> code only shows you the server side of the socket. <a href="#listing2">Listing 2</a>
+ below illustrates the code that is required for the client side. 
+Fortunately, the client side is much simpler, since you only need to 
+supply the IP address and port number to make the connection to the 
+server. In the code below, the servers IP address is assumed to be 
+192.168.0.42 and the server port is assumed to be 8181. In practice, 
+hard coding these numbers in the code is not a good idea.</p>
+            <br><a name="listing2"><b>Listing 2. Client-side socket system calls</b></a><br>
+            <table border="0" cellpadding="0" cellspacing="0" width="572"><tbody><tr><td class="code-outline"><pre class="displaycode">
+int sockfd;
+
+static struct sockaddr_in serv_addr;
+
+
+
+if((sockfd = socket(AF_INET, SOCK_STREAM,0)) &lt;0)
+
+	pexit("Network socket system call");
+
+serv_addr.sin_family = AF_INET;
+
+serv_addr.sin_addr.s_addr = inet_addr("196.168.0.42");
+
+serv_addr.sin_port = htons(8181);
+
+if(connect(connectfd, (struct sockaddr *)&amp;serv_addr, sizeof(serv_addr)) &lt;0){
+
+	perror("Network connect system call");
+
+	exit(3);
+
+/* now the sockfd can be used to communicate to the server */
+
+/* with read() and write() */
+
+</pre></td></tr></tbody></table><br>
+            <p>
+                <i>Beware</i>: the <code>bind()</code> and <code>connect()</code>  functions take a structure as the argument that must be zero filled before setting particular options. In <b>nweb.c</b>,
+ the structure is made a static C variable to ensure it is zero filled 
+when the program is started. If this structure was on the stack as a 
+variable within the function or in the heap of the process, it could be 
+filled with old data and so its content will not be zero filled. In such
+ a case, you need to ensure it is zero filled; the <code>bzero()</code> function can be used to do this. </p>
+            <br><a name="listing3"><b>Listing 3. Example use on nweb</b></a><br>
+            <table border="0" cellpadding="0" cellspacing="0" width="572"><tbody><tr><td class="code-outline"><pre class="displaycode">
+$ mkdir /home/nag/webpages
+
+$ cd /home/nag/webpages
+
+$ cp /tmp/nweb.tar .
+
+$ tar xvf nweb.tar
+
+$ ls
+
+client.c
+
+index.html
+
+nigel.jpg
+
+nweb.c
+
+nweb_AIX51
+
+nweb_RedHat9_pentium
+
+nweb_SuSE_SLES8_PowerPC
+
+$ chmod ugo+x nweb 
+
+$ chmod ugo+r *.html *.jpg
+
+$ nweb 8181 /home/nag/webpages &amp;
+
+</pre></td></tr></tbody></table><br>
+            <p>		
+
+Start your browser and access: http:// 196.168.0.42:8181/index.html.</p>
+            <div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="#ibm-pcon" class="ibm-anchor-up-link">Back to top</a></p><p><a name="server"><span class="atitle">Server source code</span></a></p>
+            <p>See <a href="http://www.ibm.com/developerworks/systems/library/es-nweb/sidefile1.html">Listing 4</a> for the server source code.</p>
+            
+            <p>The download includes:
+
+</p><ul>
+                    <li>nweb.c -- the source code</li>
+                    <li>client.c -- sample client end source code</li>
+                    <li>nweb  executable files for:
+
+	<ul>
+                            <li>AIX 5.3</li>
+                            <li>SUSE SLES 9 Linux on PowerPC/ppc64</li>
+                            <li>Fedora 5 Linux for x86</li>
+                        </ul>
+                    </li>
+                    <li>index.html -- test web page </li>
+                    <li>nigel.jpg -- test image fileDownload</li>
+                </ul>
+            <p></p>
+        <!-- CMA ID: 446318 --> <!-- Site ID: 1 --> <!-- XSLT stylesheet used to transform this file: dw-document-html-6.0.xsl -->
+<br><div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="#ibm-pcon" class="ibm-anchor-up-link">Back to top</a></p><p><span class="atitle"><a name="download">Download</a></span></p><table class="ibm-data-table" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><th scope="col">Description</th><th scope="col">Name</th><th scope="col">Size</th><th scope="col">Download method</th></tr><tr><td class="tb-row" scope="row">nweb.c  ,client.c, nweb  executable files</td><td nowrap="nowrap">es-nweb.zip</td><td nowrap="nowrap">36 KB</td><td nowrap="nowrap"><a class="fbox" href="http://www.ibm.com/developerworks/apps/download/index.jsp?contentid=446318&amp;filename=es-nweb.zip&amp;method=http&amp;locale=">HTTP</a></td></tr></tbody></table><p><a href="http://www.ibm.com/developerworks/library/whichmethod.html" class="ibm-forward-link">Information about download methods</a></p><br>
+<p><a name="resources"><span class="atitle">Resources</span></a></p><p><b>Learn</b></p><ul><li>Want more? The developerWorks <a href="http://www.ibm.com/developerWorks/aix/">AIX</a> zone hosts hundreds of informative articles and introductory, intermediate, and advanced tutorials.<br><br></li><li>The IBM developerWorks team hosts hundreds of <a href="http://www.ibm.com/developerworks/offers/techbriefings/?S_TACT=105AGX12&amp;S_CMP=ART">technical briefings</a> around the world which you can attend at no charge.<br><br></li><li>Check out <a href="http://www.amazon.com/gp/product/0139498761/103-0231809-1782216?v=glance&amp;n=283155&amp;v=glance">
+                    <i>UNIX Network Programming</i>
+                </a> (W. Richard Stevens -- Prentice Hall) at Amazon.<br><br></li></ul><p><b>Discuss</b></p><ul><li><a href="http://www.ibm.com/">Participate in the discussion forum</a>.<br><br></li><li>
+                <a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Get involved in 
+
+the developerWorks community.<br><br></li></ul>
+<p><a name="author"><span class="atitle">About the author</span></a></p><div class="ibm-container ibm-portrait-module ibm-alternate-two"><div class="ibm-container-body"><p><a name="author1"></a>Nigel
+ Griffiths has 20+ years UNIX experience, now works in the IBM eServer 
+Pre-Sales Technical Team in the United Kingdom and specializes in AIX 
+and Linux performance, sizing, tools, benchmarks, and Oracle RDBMS. 
+Nigel is well known in the AIX and Linux performance tuning area as the 
+author of freely available tools like "<a href="http://www.ibm.com/developerworks/eserver/articles/analyze_aix/index.html">nmon</a>"
+ for performance tuning and "ncp" for simple capacity 
+monitoring/planning. Officially, Nigel has the title Consulting Member 
+of the IT Specialist Profession but prefers the title Performance Guru!</p></div></div>
+<!-- MAIN_COLUMN_CONTENT_END -->
+
+<!-- INLINE_COMMENTS_START -->
+<p class="ibm-no-print"><span class="atitle"><a name="icomments">Comments</a> (Undergoing maintenance)</span></p>
+<div id="dw-icomments-container" class="ibm-no-print">
+<div class="ibm-alternate-rule"><hr></div>
+<div class="ibm-alternate-rule"><hr></div>
+<!-- Comment_Script -->
+<a id="comments" href="http://www.ibm.com/developerworks/systems/library/es-nweb/comments"></a>
+<!-- Commented out for maintenance -->
+<!-- <script language="JavaScript" src="//www.ibm.com/developerworks/js/insertcomment.js" type="text/javascript">//</script> -->
+<div id="threadShow"></div>
+<script language="JavaScript" type="text/javascript">
+// <![CDATA[
+// jQuery('threadShow').insertComment('95%',5,'nCmts','icomments');
+// ]]>
+</script>
+</div>
+<!-- INLINE_COMMENTS_END -->
+
+<p class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p>
+<p><a href="http://www.ibm.com/developerworks/ibm/trademarks/">Trademarks</a> &nbsp;|&nbsp; <a href="https://www.ibm.com/developerworks/mydeveloperworks/terms/">My developerWorks terms and conditions</a></p>
+
+<!-- Overlays -->
+<!-- Zone/Leaf_Interest_Overlay_Start -->
+<div class="ibm-common-overlay ibm-no-print" id="dwmyinterestadd">
+<div class="ibm-head"><p><a class="ibm-common-overlay-close" href="#close">Close [x]</a></p></div>
+<div class="ibm-body">
+<div class="ibm-main">
+<a class="ibm-access" name="dwmyinterestaddhelp">Help: Update or add to My dW interests</a>   
+<div class="ibm-title"><h1>What's this?</h1></div>
+<div class="ibm-container ibm-alternate">
+<p>This little timesaver lets you update your My developerWorks profile 
+with just one click!  The general subject of this content (AIX and UNIX,
+ Information Management, Lotus, Rational, Tivoli, WebSphere, Java, 
+Linux, Open source, SOA and Web services, Web development, or XML) will 
+be added to the interests section of your profile, if it's not there 
+already.  You only need to be logged in to My developerWorks.</p>
+<p>And what's the point of adding your interests to your profile?  
+That's how you find other users with the same interests as yours, and 
+see what they're reading and contributing to the community.  Your 
+interests also help us recommend relevant developerWorks content to you.</p>
+<p><a href="https://www.ibm.com/developerworks/mydeveloperworks/profiles/home.do?lang=en">View your My developerWorks profile</a></p>
+<p class="ibm-access"><a href="#interestShow">Return from help</a></p>
+</div> 
+</div>
+</div>
+<div class="ibm-footer"></div>
+</div>
+
+<div class="ibm-common-overlay ibm-no-print" id="dwmyinterestremove">
+<div class="ibm-head"><p><a class="ibm-common-overlay-close" href="#close">Close [x]</a></p></div>
+<div class="ibm-body">
+<div class="ibm-main">
+<a class="ibm-access" name="dwmyinterestremovehelp">Help: Remove from My dW interests</a> 
+<div class="ibm-title"><h1>What's this?</h1></div>
+<div class="ibm-container ibm-alternate">
+<p>Removing this interest does not alter your profile, but rather 
+removes this piece of content from a list of all content for which 
+you've indicated interest.  In a future enhancement to My 
+developerWorks, you'll be able to see a record of that content.</p>
+<p><a href="https://www.ibm.com/developerworks/mydeveloperworks/profiles/home.do?lang=en">View your My developerWorks profile</a></p>
+<p class="ibm-access"><a href="#interestShow">Return from help</a></p>
+</div> 
+</div>
+</div>
+<div class="ibm-footer"></div>
+</div>
+<!-- Zone/Leaf_Interest_Overlay_End --></div>
+<!-- MAIN_COLUMN_CONTAINER_END -->
+
+<!-- Rating_Meta_BEGIN -->
+<!--Rating_Meta_BEGIN--><div class="metavalue">static.content.url=http://www.ibm.com/developerworks/js/artrating/</div><div class="metavalue">SITE_ID=1</div><div class="metavalue">Zone=AIX and UNIX</div><div class="metavalue">ArticleID=446318</div><div class="metavalue">ArticleTitle=nweb: a tiny, safe Web server (static pages only)</div><div class="metavalue">publish-date=09252006</div><div class="metavalue">author1-email=nag@uk.ibm.com</div><div class="metavalue">author1-email-cc=</div><script language="javascript" type="text/javascript">document.write('<div class="metavalue">url='+location.href+'</div>');</script><div class="metavalue">url=http://www.ibm.com/developerworks/systems/library/es-nweb/index.html</div><!--Rating_Meta_END-->
+<!-- Rating_Meta_END -->
+
+</div>
+<!-- MAIN_COLUMN_END-->
+
+<!-- RIGHT_COLUMN_BEGIN -->
+<div id="ibm-content-sidebar">
+
+<!-- RIGHT_COLUMN_CONTENT_BEGIN --> 
+<div class="ibm-container"><h2>Table of contents</h2><div class="ibm-container-body"><img alt="" src="index_files/c.gif" height="1" width="1"><ul class="ibm-bullet-list"><li><a class="ibm-feature-link" href="#N10069">Introduction</a></li><li><a class="ibm-feature-link" href="#N100BA">Functions within nweb</a></li><li><a class="ibm-feature-link" href="#N100E4">Pseudo code</a></li><li><a class="ibm-feature-link" href="#N100FC">Socket system calls</a></li><li><a class="ibm-feature-link" href="#N10181">Other system calls</a></li><li><a class="ibm-feature-link" href="#N101DA">Client-side socket system calls</a></li><li><a class="ibm-feature-link" href="#server">Server source code</a></li><li><a class="ibm-feature-link" href="#download">Download</a></li><li><a class="ibm-feature-link" href="#resources">Resources</a></li><li><a class="ibm-feature-link" href="#author">About the author</a></li><li><a class="ibm-feature-link" href="#icomments">Comments</a></li></ul></div></div>
+
+
+<!-- Tagging_Start -->
+<div id="dw-tag-cloud-container" class="ibm-container dw-hidetag"><h2>Tags</h2>
+<div id="dw-tag-help"><a class="dwauthor" rel="#tagtip" id="dwtagtip"><img alt="Help" src="index_files/help_icon.gif" height="16" align="top" width="16"></a></div>
+<div style="display: none;" id="tagtip" class="dwauthor-onload-state ibm-no-print">Use the <strong>search field</strong> to find all types of content in My developerWorks with that tag.<p>Use the <strong>slider bar</strong> to see more or fewer tags.</p><p><strong>Popular tags</strong> shows the top tags for this particular content zone (for example, Java technology, Linux, WebSphere).</p><p><strong>My tags</strong> shows your tags for this particular content zone (for example, Java technology, Linux, WebSphere).</p></div>
+<div class="ibm-access">Use the search field to find all types of content in My developerWorks with that tag.  <em>Popular tags</em> shows the top tags for this particular content zone (for example, Java technology, Linux, WebSphere).  <em>My tags</em> shows your tags for this particular content zone (for example, Java technology, Linux, WebSphere).</div>
+<div class="ibm-container-body">
+<div class="dw-tag-search"><form action="//www.ibm.com/developerworks/mydeveloperworks/bookmarks/html?lang=en" method="get" id="actualtagform" onsubmit="popupform(this, 'join')">
+<p><label for="tagfield"><strong>Search all tags</strong></label><input id="tagfield" name="tag" maxlength="20" size="17" type="text">&nbsp;<input src="index_files/short-btn.gif" class="ibm-btn-view" alt="submit search" title="submit search" value="Search" type="image"></p></form></div>
+<div class="ibm-rule"><hr></div>
+<div id="dw-tag-select">
+<div id="dw-tag-select-popular"><p><strong>Popular article tags</strong>&nbsp;|&nbsp;<br><a id="a-my" href="javascript:;">My article tags</a><a href="#dw-tag-access" class="ibm-access">Skip to tags list</a></p></div>
+<div id="dw-tag-select-my" class="dw-hidetag"><p><a id="a-popular" href="javascript:;">Popular article tags</a>&nbsp;|&nbsp;<br><strong>My article tags</strong></p><a href="#dw-tag-access" class="ibm-access">Skip to tags list</a></div>
+<div id="dw-tag-cloud"></div>  
+</div>   
+</div>
+</div>
+<!-- Tagging_End -->
+<!-- Dig_Deeper -->
+
+<!-- High_Visibility_Offer -->
+
+<!-- Special_Offers -->
+
+<!-- RIGHT_COLUMN_CONTENT_END -->
+
+</div>
+<!-- RIGHT_COLUMN_END -->
+
+<!-- CONTENT_BODY_END -->
+</div>
+
+</div>
+<!-- CONTENT_END -->
+
+ <!-- END_IBM-PCON -->
+</div>
+
+<!-- FOOTER_BEGIN -->
+<div id="ibm-page-tools">
+<!-- IBM page tools container -->
+</div>
+<div id="ibm-footer">
+<ul>
+<li class="ibm-first"><a href="http://www.ibm.com/ibm/">About IBM</a></li>
+<li><a href="http://www.ibm.com/privacy/">Privacy</a></li>
+<li><a href="http://www.ibm.com/contact/">Contact</a></li>
+<li><a href="http://www.ibm.com/legal/">Terms of use</a></li>
+<li><a href="http://www.ibm.com/ibm/syndication/us/en/?cm_re=footer-_-ibmfeeds-_-top_level">IBM Feeds</a></li><li><a href="http://www.ibm.com/employment/?cm_re=footer-_-jobs-_-top_level">Jobs</a></li></ul>
+<div id="ibm-social-tools"><ul><li><a rel="print" href="#" title="Print this page" class="ibm-share-print"></a></li><li><a rel="email" href="#" title="E-mail this page" class="ibm-share-email"></a></li><li><a rel="digg" href="http://digg.com/submit?phase=2&amp;url=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fsystems%2Flibrary%2Fes-nweb%2Findex.html&amp;title=nweb%3A%20a%20tiny%2C%20safe%20Web%20server%20%28static%20pages%20only%29" title="Digg" class="ibm-share-digg"></a></li><li><a rel="facebook" href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fsystems%2Flibrary%2Fes-nweb%2Findex.html&amp;t=nweb%3A%20a%20tiny%2C%20safe%20Web%20server%20%28static%20pages%20only%29" title="Facebook" class="ibm-share-facebook"></a></li><li><a rel="twitter" href="http://twitter.com/?status=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fsystems%2Flibrary%2Fes-nweb%2Findex.html%20-%20nweb%3A%20a%20tiny%2C%20safe%20Web%20server%20%28static%20pages%20only%29" title="Twitter" class="ibm-share-twitter"></a></li><li><a rel="delicious" href="http://delicious.com/post?url=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fsystems%2Flibrary%2Fes-nweb%2Findex.html&amp;title=nweb%3A%20a%20tiny%2C%20safe%20Web%20server%20%28static%20pages%20only%29" title="Delicious" class="ibm-share-delicious"></a></li><li><a rel="linkedin" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fsystems%2Flibrary%2Fes-nweb%2Findex.html&amp;title=nweb%3A%20a%20tiny%2C%20safe%20Web%20server%20%28static%20pages%20only%29" title="Linked In" class="ibm-share-linkedin"></a></li><li><a rel="stumble" href="http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fsystems%2Flibrary%2Fes-nweb%2Findex.html&amp;title=nweb%3A%20a%20tiny%2C%20safe%20Web%20server%20%28static%20pages%20only%29" title="Stumbleupon" class="ibm-share-stumble"></a></li></ul></div></div>
+<!-- FOOTER_END -->
+
+ <!-- END_IBM-TOP -->
+<div id="ibm-overlay-top"></div></div>
+ 
+ <!-- SCRIPTS_INCLUDE_BEGIN -->
+<!-- JQuery start -->
+<script type="text/javascript" language="JavaScript" src="index_files/jquery_002.js"></script>
+<script type="text/javascript" language="JavaScript" src="index_files/jquery_003.js"></script>
+<script type="text/javascript" language="JavaScript" src="index_files/jquery.js"></script>
+<script type="text/javascript" language="JavaScript" src="index_files/ui_002.js"></script>
+<script type="text/javascript" language="JavaScript" src="index_files/ui.js"></script>
+<script type="text/javascript" language="JavaScript" src="index_files/dwjquerytags.js"></script>
+<script type="text/javascript" language="JavaScript">
+	jQuery.noConflict();     
+	// Put all your code in your document ready area
+	jQuery(document).ready(function(jQuery) {
+	// Do jQuery stuff using jQuery 
+	jQuery('a.dwauthor').cluetip({
+		local: true,
+		showTitle: false,
+		positionBy: 'bottomTop',
+		sticky: true,	
+		mouseOutClose: true,
+		closeText: '<img src="//www.ibm.com/developerworks/js/jquery/cluetip98/i/x.gif" alt="Close" />',
+		arrows: false,
+		dropShadow: true,
+		cluetipClass: 'dwbasic'
+		});   	
+	});
+ </script>
+ <!-- JQuery end -->
+ <!-- Overlay js -->
+<script language="JavaScript" src="index_files/overlay.js" type="text/javascript"></script>
+<!-- My dW Interest article -->
+<script language="JavaScript" src="index_files/showinterest.js" type="text/javascript">//</script>
+<script language="JavaScript" type="text/javascript">
+        // <![CDATA[
+			var contentId = '';
+			var contentAreas = '';
+			var caArr = [];
+			contentId = '446318';
+			contentAreas = 'aix';
+			if(contentAreas != ''){caArr = contentAreas.split(',');}
+			var loginLink = 'https://www.ibm.com/developerworks/dwwi/DWAuthRouter?m=loginpage&d=' + encodeURIComponent(window.location);jQuery('interestShow').showInterest(contentId,'dw-article',{'int_tops':[],'int_prods':[], 'int_prod_fam':[],'int_cont_area':caArr},
+'<div id="dw-interest-anon"><a id="intAnonBtn" class="ibm-external-link" href="">Update My dW interests</a> (<a class="dw-interest" href="' + loginLink + '">Log in</a> | <a class="dw-interest" href="#overlay" onclick="ibmCommon.Overlays.show(\'dwmyinterestadd\', this);return false;">What\'s this?</a>) <a class="ibm-access" href="#dwmyinterestaddhelp">Skip to help for Update My dW interests</a></div>',
+'<div id="dw-interest-add"><a id="intSelectBtn" class="ibm-external-link" href="">Add to My dW interests</a> (<a class="dw-interest" href="#overlay" onclick="ibmCommon.Overlays.show(\'dwmyinterestadd\', this);return false;">What\'s this?</a>) <a class="ibm-access" href="#dwmyinterestaddhelp">Skip to help for Add to My dW interests</a></div>',
+'<div id="dw-interest-remove"><a id="intDeselectBtn" class="ibm-external-link" href="">Remove from My dW interests</a> (<a class="dw-interest" href="#overlay" onclick="ibmCommon.Overlays.show(\'dwmyinterestremove\', this);return false;">What\'s this?</a>) <a class="ibm-access" href="#dwmyinterestremovehelp">Skip to help for Remove from My dW interests</a></div>'
+);
+// ]]>
+</script>
+<!-- SCRIPTS_INCLUDE_END -->
+
+<div id="ibm-metrics">
+<script src="index_files/stats.js" type="text/javascript">//</script>
+</div>
+
+
+<div style="position: absolute; z-index: 95; display: none;" id="cluetip-waitimage"></div><div style="z-index: 96; display: none; position: absolute;" id="cluetip"><div style="z-index: 95; opacity: 0.1; top: 1px; left: 1px; position: absolute; background-color: rgb(0, 0, 0);"></div><div style="z-index: 94; opacity: 0.1; top: 2px; left: 2px; position: absolute; background-color: rgb(0, 0, 0);"></div><div style="z-index: 93; opacity: 0.1; top: 3px; left: 3px; position: absolute; background-color: rgb(0, 0, 0);"></div><div style="z-index: 92; opacity: 0.1; top: 4px; left: 4px; position: absolute; background-color: rgb(0, 0, 0);"></div><div style="z-index: 91; opacity: 0.1; top: 5px; left: 5px; position: absolute; background-color: rgb(0, 0, 0);"></div><div style="z-index: 90; opacity: 0.1; top: 6px; left: 6px; position: absolute; background-color: rgb(0, 0, 0);"></div><div style="position: relative; z-index: 97;" id="cluetip-outer"><div id="cluetip-title"></div><div id="cluetip-inner"></div></div><div id="cluetip-extra"></div><div style="z-index: 97;" id="cluetip-arrows" class="cluetip-arrows"></div></div></body></html>

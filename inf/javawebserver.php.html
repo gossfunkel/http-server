@@ -1,0 +1,629 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+<!--
+-->
+</style>
+<script language="JavaScript" type="text/JavaScript">
+<!--
+function MM_reloadPage(init) {  //reloads the window if Nav4 resized
+  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
+    document.MM_pgW=innerWidth; document.MM_pgH=innerHeight; onresize=MM_reloadPage; }}
+  else if (innerWidth!=document.MM_pgW || innerHeight!=document.MM_pgH) location.reload();
+}
+MM_reloadPage(true);
+//-->
+</script>
+</head>
+
+<body alink="#FFFFFF" bgcolor="#CCCCCC" link="#003399" text="#000000" vlink="#993300">
+<table align="center" border="0" cellpadding="10" cellspacing="10" width="800">
+  <tbody><tr> 
+    <td><p align="left"><a href="http://fragments.turtlemeat.com/"><img src="javawebserver.php_files/frags.gif" height="142" border="0" width="786"></a></p>
+      
+    <a href="http://fragments.turtlemeat.com/">HOME</a> 
+  
+    <br>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tbody><tr> 
+          
+        <td>stuff you never thought you wanted to know. <strong><br>
+          </strong> </td>
+          <td> 
+            <!--Skyscraper-->
+          </td>
+        </tr>
+        <tr> 
+          
+        <td width="79%"><strong><br>
+          </strong></td>
+          <td width="21%">&nbsp; </td>
+        </tr>
+        <tr> 
+          <td> <br>
+        </td>
+          <td>&nbsp;</td>
+        </tr>
+      </tbody></table>
+        <script type="text/javascript"><!--
+google_ad_client = "pub-5144998296566996";
+/* 300x250, created 3/21/11 */
+google_ad_slot = "5611089128";
+google_ad_width = 300;
+google_ad_height = 250;
+//-->
+</script>
+<script type="text/javascript" src="javawebserver.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:250px;margin:0;padding:0;position:relative;visibility:visible;width:300px"><ins id="aswift_0_anchor" style="display:block;border:none;height:250px;margin:0;padding:0;position:relative;visibility:visible;width:300px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0px; position: absolute; top: 0px;" frameborder="0" height="250" scrolling="no" width="300"></iframe></ins></ins>
+<title>Creating a simple java web server</title>
+
+<font size="+2">Here is a tutorial on how to whip up a simple
+    web server in Java? with working runnable code; sourcecode and
+    bytecode files.</font><p></p>
+
+    <p>written by <a href="mailto:jon.berg%5Bon_server%5Dturtlemeat.com">Jon
+    Berg</a>. (figure out the email)<br>
+    <u><img src="javawebserver.php_files/screencapture.gif" naturalsizeflag="0" height="347" align="bottom" border="0" width="423"></u></p>
+
+    <p>This is the window that comes up when you run the program,
+    just a little motivator so you can see what's in the end of the
+    tunnel.</p>
+
+    <p><b><u><font size="+1">Note</font></u></b> to get the maximum
+    out of this tutorial it is recommended that you have a basic
+    grasp on how HTTP works. If the little man inside your head says
+    what tha H is HTTP, you should go to the bottom and check some
+    of the pointers. There you will find some nice text to explain
+    the basic concept.</p>
+
+    <p>Let's get started!<br>
+    When making a program nowadays the first thing you should think
+    about is the GUI (graphical user interface). If the program dosen't
+    look fancy, you can just press all the cancel buttons on the
+    project. Ok that was meant as a joke, but there is some truth
+    in it. People tend to judge a program a lot on its look, even
+    though the real coding job is in making the stuff that goes on
+    behind the scenes.</p>
+
+    <p>The good news is that we are making this in Java, and since
+    Java is such a friendly programming language it's real easy to
+    get some interface going. Comments are in green.</p>
+
+    <p><table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tbody><tr>
+        
+      <td bgcolor="#ffffff" width="100%"> <code><font color="#3f7f5f">//file:&nbsp;webserver_starter.java</font><br>
+        <font color="#3f7f5f">//declare&nbsp;a&nbsp;class&nbsp;wich&nbsp;inherit&nbsp;JFrame</font><br>
+        <font color="#7f0055"><b>public&nbsp;class&nbsp;</b></font><font color="#000000">webserver_starter</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>extends&nbsp;</b></font><font color="#000000">JFrame&nbsp;</font><font color="#000000">{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">//declare&nbsp;some&nbsp;panel,&nbsp;scrollpanel,&nbsp;textarea&nbsp;for&nbsp;gui</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">JPanel&nbsp;jPanel1&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">JPanel</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">JScrollPane&nbsp;jScrollPane1&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">JScrollPane</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">JTextArea&nbsp;jTextArea2&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">JTextArea</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>static&nbsp;</b></font><font color="#000000">Integer&nbsp;listen_port&nbsp;=&nbsp;</font><font color="#7f0055"><b>null</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">//basic&nbsp;class&nbsp;constructor</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#000000">webserver_starter</font><font color="#000000">()&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try&nbsp;</b></font><font color="#000000">{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">jbInit</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Exception&nbsp;e</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">e.printStackTrace</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">//the&nbsp;JavaAPI&nbsp;entry&nbsp;point</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">//where&nbsp;it&nbsp;starts&nbsp;this&nbsp;class&nbsp;if&nbsp;run</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;static&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">main</font><font color="#000000">(</font><font color="#000000">String</font><font color="#000000">[]&nbsp;</font><font color="#000000">args</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//start&nbsp;server&nbsp;on&nbsp;port&nbsp;x,&nbsp;default&nbsp;80</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//use&nbsp;argument&nbsp;to&nbsp;main&nbsp;for&nbsp;what&nbsp;port&nbsp;to&nbsp;start&nbsp;on</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try&nbsp;</b></font><font color="#000000">{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">listen_port&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">Integer</font><font color="#000000">(</font><font color="#000000">args</font><font color="#000000">[</font><font color="#990000">0</font><font color="#000000">])</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//catch&nbsp;parse&nbsp;error</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Exception&nbsp;e</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">listen_port&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">Integer</font><font color="#000000">(</font><font color="#990000">80</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//create&nbsp;an&nbsp;instance&nbsp;of&nbsp;this&nbsp;class</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">webserver_starter&nbsp;webserver&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">webserver_starter</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">//set&nbsp;up&nbsp;the&nbsp;user&nbsp;interface</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">jbInit</font><font color="#000000">()&nbsp;</font><font color="#7f0055"><b>throws&nbsp;</b></font><font color="#000000">Exception&nbsp;</font><font color="#000000">{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//oh&nbsp;the&nbsp;pretty&nbsp;colors</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">jTextArea2.setBackground</font><font color="#000000">(</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">Color</font><font color="#000000">(</font><font color="#990000">16</font><font color="#000000">,&nbsp;</font><font color="#990000">12</font><font color="#000000">,&nbsp;</font><font color="#990000">66</font><font color="#000000">))</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">jTextArea2.setForeground</font><font color="#000000">(</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">Color</font><font color="#000000">(</font><font color="#990000">151</font><font color="#000000">,&nbsp;</font><font color="#990000">138</font><font color="#000000">,&nbsp;</font><font color="#990000">255</font><font color="#000000">))</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">jTextArea2.setBorder</font><font color="#000000">(</font><font color="#000000">BorderFactory.createLoweredBevelBorder</font><font color="#000000">())</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">jTextArea2.setToolTipText</font><font color="#000000">(</font><font color="#2a00ff">""</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">jTextArea2.setEditable</font><font color="#000000">(</font><font color="#7f0055"><b>false</b></font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">jTextArea2.setColumns</font><font color="#000000">(</font><font color="#990000">30</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">jTextArea2.setRows</font><font color="#000000">(</font><font color="#990000">15</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//change&nbsp;this&nbsp;to&nbsp;impress&nbsp;your&nbsp;friends</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>this</b></font><font color="#000000">.setTitle</font><font color="#000000">(</font><font color="#2a00ff">"Jon\'s&nbsp;fancy&nbsp;prancy&nbsp;webserver"</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//ugly&nbsp;inline&nbsp;listener,&nbsp;it's&nbsp;for&nbsp;handling&nbsp;closing&nbsp;of&nbsp;the&nbsp;window</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>this</b></font><font color="#000000">.addWindowListener</font><font color="#000000">(</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">java.awt.event.WindowAdapter</font><font color="#000000">()&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">windowClosing</font><font color="#000000">(</font><font color="#000000">WindowEvent&nbsp;e</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">this_windowClosed</font><font color="#000000">(</font><font color="#000000">e</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">})</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//add&nbsp;the&nbsp;various&nbsp;to&nbsp;the&nbsp;proper&nbsp;containers</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">jScrollPane1.getViewport</font><font color="#000000">()</font><font color="#000000">.add</font><font color="#000000">(</font><font color="#000000">jTextArea2</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">jPanel1.add</font><font color="#000000">(</font><font color="#000000">jScrollPane1</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>this</b></font><font color="#000000">.getContentPane</font><font color="#000000">()</font><font color="#000000">.add</font><font color="#000000">(</font><font color="#000000">jPanel1,&nbsp;BorderLayout.EAST</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//tveak&nbsp;the&nbsp;apearance</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>this</b></font><font color="#000000">.setVisible</font><font color="#000000">(</font><font color="#7f0055"><b>true</b></font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>this</b></font><font color="#000000">.setSize</font><font color="#000000">(</font><font color="#990000">420</font><font color="#000000">,&nbsp;</font><font color="#990000">350</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>this</b></font><font color="#000000">.setResizable</font><font color="#000000">(</font><font color="#7f0055"><b>false</b></font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//make&nbsp;sure&nbsp;it&nbsp;is&nbsp;drawn</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>this</b></font><font color="#000000">.validate</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//create&nbsp;the&nbsp;actual&nbsp;serverstuff,</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//all&nbsp;that&nbsp;is&nbsp;implemented&nbsp;in&nbsp;another&nbsp;class</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">server</font><font color="#000000">(</font><font color="#000000">listen_port.intValue</font><font color="#000000">()</font><font color="#000000">,&nbsp;</font><font color="#7f0055"><b>this</b></font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">//exit&nbsp;program&nbsp;when&nbsp;"X"&nbsp;is&nbsp;pressed.</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">this_windowClosed</font><font color="#000000">(</font><font color="#000000">WindowEvent&nbsp;e</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">System.exit</font><font color="#000000">(</font><font color="#990000">1</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">//this&nbsp;is&nbsp;a&nbsp;method&nbsp;to&nbsp;get&nbsp;messages&nbsp;from&nbsp;the&nbsp;actual</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">//server&nbsp;to&nbsp;the&nbsp;window</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">send_message_to_window</font><font color="#000000">(</font><font color="#000000">String&nbsp;s</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">jTextArea2.append</font><font color="#000000">(</font><font color="#000000">s</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#000000">}&nbsp;</font><font color="#3f7f5f">//class&nbsp;end</font></code> 
+      </td>
+      </tr>
+    </tbody></table></p>
+
+    <p>In a nutshell this code sets up the window and makes everything
+    look good. If you look at the picture of the program on top of
+    this page. This code makes that!</p>
+
+    <p>Ok, enough time wasted on the look. Lets get down with the
+    fun stuff, <b><font size="+1">making the actual httpserver</font></b>.<br>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tbody><tr>
+        
+      <td bgcolor="#ffffff" width="100%"> <code><font color="#3f7f5f">//file:&nbsp;server.java</font><br>
+        <font color="#3f7f5f">//the&nbsp;real&nbsp;(http)&nbsp;serverclass</font><br>
+        <font color="#3f7f5f">//it&nbsp;extends&nbsp;thread&nbsp;so&nbsp;the&nbsp;server&nbsp;is&nbsp;run&nbsp;in&nbsp;a&nbsp;different</font><br>
+        <font color="#3f7f5f">//thread&nbsp;than&nbsp;the&nbsp;gui,&nbsp;that&nbsp;is&nbsp;to&nbsp;make&nbsp;it&nbsp;responsive.</font><br>
+        <font color="#3f7f5f">//it's&nbsp;really&nbsp;just&nbsp;a&nbsp;macho&nbsp;coding&nbsp;thing.</font><br>
+        <font color="#7f0055"><b>public&nbsp;class&nbsp;</b></font><font color="#000000">server</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>extends&nbsp;</b></font><font color="#000000">Thread&nbsp;</font><font color="#000000">{</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#3f7f5f">//the&nbsp;constructor&nbsp;method</font><br>
+        <font color="#3f7f5f">//the&nbsp;parameters&nbsp;it&nbsp;takes&nbsp;is&nbsp;what&nbsp;port&nbsp;to&nbsp;bind&nbsp;to,&nbsp;the&nbsp;default&nbsp;tcp&nbsp;port</font><br>
+        <font color="#3f7f5f">//for&nbsp;a&nbsp;httpserver&nbsp;is&nbsp;port&nbsp;80.&nbsp;the&nbsp;other&nbsp;parameter&nbsp;is&nbsp;a&nbsp;reference&nbsp;to</font><br>
+        <font color="#3f7f5f">//the&nbsp;gui,&nbsp;this&nbsp;is&nbsp;to&nbsp;pass&nbsp;messages&nbsp;to&nbsp;our&nbsp;nice&nbsp;interface</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#000000">server</font><font color="#000000">(</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">listen_port,&nbsp;webserver_starter&nbsp;to_send_message_to</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">message_to&nbsp;=&nbsp;to_send_message_to;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">port&nbsp;=&nbsp;listen_port;</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#3f7f5f">//this&nbsp;makes&nbsp;a&nbsp;new&nbsp;thread,&nbsp;as&nbsp;mentioned&nbsp;before,it's&nbsp;to&nbsp;keep&nbsp;gui&nbsp;in</font><br>
+        <font color="#3f7f5f">//one&nbsp;thread,&nbsp;server&nbsp;in&nbsp;another.&nbsp;You&nbsp;may&nbsp;argue&nbsp;that&nbsp;this&nbsp;is&nbsp;totally</font><br>
+        <font color="#3f7f5f">//unnecessary,&nbsp;but&nbsp;we&nbsp;are&nbsp;gonna&nbsp;have&nbsp;this&nbsp;on&nbsp;the&nbsp;web&nbsp;so&nbsp;it&nbsp;needs&nbsp;to</font><br>
+        <font color="#3f7f5f">//be&nbsp;a&nbsp;bit&nbsp;macho!&nbsp;Another&nbsp;thing&nbsp;is&nbsp;that&nbsp;real&nbsp;pro&nbsp;webservers&nbsp;handles</font><br>
+        <font color="#3f7f5f">//each&nbsp;request&nbsp;in&nbsp;a&nbsp;new&nbsp;thread.&nbsp;This&nbsp;server&nbsp;dosen't,&nbsp;it&nbsp;handles&nbsp;each</font><br>
+        <font color="#3f7f5f">//request&nbsp;one&nbsp;after&nbsp;another&nbsp;in&nbsp;the&nbsp;same&nbsp;thread.&nbsp;This&nbsp;can&nbsp;be&nbsp;a&nbsp;good</font><br>
+        <font color="#3f7f5f">//assignment!!&nbsp;To&nbsp;redo&nbsp;this&nbsp;code&nbsp;so&nbsp;that&nbsp;each&nbsp;request&nbsp;to&nbsp;the&nbsp;server</font><br>
+        <font color="#3f7f5f">//is&nbsp;handled&nbsp;in&nbsp;its&nbsp;own&nbsp;thread.&nbsp;The&nbsp;way&nbsp;it&nbsp;is&nbsp;now&nbsp;it&nbsp;blocks&nbsp;while</font><br>
+        <font color="#3f7f5f">//one&nbsp;client&nbsp;access&nbsp;the&nbsp;server,&nbsp;ex&nbsp;if&nbsp;it&nbsp;transferres&nbsp;a&nbsp;big&nbsp;file&nbsp;the</font><br>
+        <font color="#3f7f5f">//client&nbsp;have&nbsp;to&nbsp;wait&nbsp;real&nbsp;long&nbsp;before&nbsp;it&nbsp;gets&nbsp;any&nbsp;response.</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>this</b></font><font color="#000000">.start</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">s</font><font color="#000000">(</font><font color="#000000">String&nbsp;s2</font><font color="#000000">)&nbsp;{&nbsp;</font><font color="#3f7f5f">//an&nbsp;alias&nbsp;to&nbsp;avoid&nbsp;typing&nbsp;so&nbsp;much!</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">message_to.send_message_to_window</font><font color="#000000">(</font><font color="#000000">s2</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#000000">webserver_starter&nbsp;message_to;&nbsp;</font><font color="#3f7f5f">//the&nbsp;starter&nbsp;class,&nbsp;needed&nbsp;for&nbsp;gui</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">port;&nbsp;</font><font color="#3f7f5f">//port&nbsp;we&nbsp;are&nbsp;going&nbsp;to&nbsp;listen&nbsp;to</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#3f7f5f">//this&nbsp;is&nbsp;a&nbsp;overridden&nbsp;method&nbsp;from&nbsp;the&nbsp;Thread&nbsp;class&nbsp;we&nbsp;extended&nbsp;from</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">run</font><font color="#000000">()&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//we&nbsp;are&nbsp;now&nbsp;inside&nbsp;our&nbsp;own&nbsp;thread&nbsp;separated&nbsp;from&nbsp;the&nbsp;gui.</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">ServerSocket&nbsp;serversocket&nbsp;=&nbsp;</font><font color="#7f0055"><b>null</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//To&nbsp;easily&nbsp;pick&nbsp;up&nbsp;lots&nbsp;of&nbsp;girls,&nbsp;change&nbsp;this&nbsp;to&nbsp;your&nbsp;name!!!</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s</font><font color="#000000">(</font><font color="#2a00ff">"The&nbsp;simple&nbsp;httpserver&nbsp;v.&nbsp;0000000000\nCoded&nbsp;by&nbsp;Jon&nbsp;Berg"&nbsp;</font><font color="#000000">+</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#2a00ff">"&lt;jon.berg[on&nbsp;server]turtlemeat.com&gt;\n\n"</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//Pay&nbsp;attention,&nbsp;this&nbsp;is&nbsp;where&nbsp;things&nbsp;starts&nbsp;to&nbsp;cook!</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try&nbsp;</b></font><font color="#000000">{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//print/send&nbsp;message&nbsp;to&nbsp;the&nbsp;guiwindow</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s</font><font color="#000000">(</font><font color="#2a00ff">"Trying&nbsp;to&nbsp;bind&nbsp;to&nbsp;localhost&nbsp;on&nbsp;port&nbsp;"&nbsp;</font><font color="#000000">+&nbsp;Integer.toString</font><font color="#000000">(</font><font color="#000000">port</font><font color="#000000">)&nbsp;</font><font color="#000000">+&nbsp;</font><font color="#2a00ff">"..."</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//make&nbsp;a&nbsp;ServerSocket&nbsp;and&nbsp;bind&nbsp;it&nbsp;to&nbsp;given&nbsp;port,</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">serversocket&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">ServerSocket</font><font color="#000000">(</font><font color="#000000">port</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Exception&nbsp;e</font><font color="#000000">)&nbsp;{&nbsp;</font><font color="#3f7f5f">//catch&nbsp;any&nbsp;errors&nbsp;and&nbsp;print&nbsp;errors&nbsp;to&nbsp;gui</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s</font><font color="#000000">(</font><font color="#2a00ff">"\nFatal&nbsp;Error:"&nbsp;</font><font color="#000000">+&nbsp;e.getMessage</font><font color="#000000">())</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s</font><font color="#000000">(</font><font color="#2a00ff">"OK!\n"</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//go&nbsp;in&nbsp;a&nbsp;infinite&nbsp;loop,&nbsp;wait&nbsp;for&nbsp;connections,&nbsp;process&nbsp;request,&nbsp;send&nbsp;response</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>while&nbsp;</b></font><font color="#000000">(</font><font color="#7f0055"><b>true</b></font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s</font><font color="#000000">(</font><font color="#2a00ff">"\nReady,&nbsp;Waiting&nbsp;for&nbsp;requests...\n"</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try&nbsp;</b></font><font color="#000000">{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//this&nbsp;call&nbsp;waits/blocks&nbsp;until&nbsp;someone&nbsp;connects&nbsp;to&nbsp;the&nbsp;port&nbsp;we</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//are&nbsp;listening&nbsp;to</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">Socket&nbsp;connectionsocket&nbsp;=&nbsp;serversocket.accept</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//figure&nbsp;out&nbsp;what&nbsp;ipaddress&nbsp;the&nbsp;client&nbsp;commes&nbsp;from,&nbsp;just&nbsp;for&nbsp;show!</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">InetAddress&nbsp;client&nbsp;=&nbsp;connectionsocket.getInetAddress</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//and&nbsp;print&nbsp;it&nbsp;to&nbsp;gui</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s</font><font color="#000000">(</font><font color="#000000">client.getHostName</font><font color="#000000">()&nbsp;</font><font color="#000000">+&nbsp;</font><font color="#2a00ff">"&nbsp;connected&nbsp;to&nbsp;server.\n"</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//Read&nbsp;the&nbsp;http&nbsp;request&nbsp;from&nbsp;the&nbsp;client&nbsp;from&nbsp;the&nbsp;socket&nbsp;interface</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//into&nbsp;a&nbsp;buffer.</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">BufferedReader&nbsp;input&nbsp;=</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">BufferedReader</font><font color="#000000">(</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">InputStreamReader</font><font color="#000000">(</font><font color="#000000">connectionsocket.</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">getInputStream</font><font color="#000000">()))</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//Prepare&nbsp;a&nbsp;outputstream&nbsp;from&nbsp;us&nbsp;to&nbsp;the&nbsp;client,</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//this&nbsp;will&nbsp;be&nbsp;used&nbsp;sending&nbsp;back&nbsp;our&nbsp;response</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//(header&nbsp;+&nbsp;requested&nbsp;file)&nbsp;to&nbsp;the&nbsp;client.</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">DataOutputStream&nbsp;output&nbsp;=</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">DataOutputStream</font><font color="#000000">(</font><font color="#000000">connectionsocket.getOutputStream</font><font color="#000000">())</font><font color="#000000">;</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#3f7f5f">//as&nbsp;the&nbsp;name&nbsp;suggest&nbsp;this&nbsp;method&nbsp;handles&nbsp;the&nbsp;http&nbsp;request,&nbsp;see&nbsp;further&nbsp;down.</font><br>
+        <font color="#3f7f5f">//abstraction&nbsp;rules</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">http_handler</font><font color="#000000">(</font><font color="#000000">input,&nbsp;output</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Exception&nbsp;e</font><font color="#000000">)&nbsp;{&nbsp;</font><font color="#3f7f5f">//catch&nbsp;any&nbsp;errors,&nbsp;and&nbsp;print&nbsp;them</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s</font><font color="#000000">(</font><font color="#2a00ff">"\nError:"&nbsp;</font><font color="#000000">+&nbsp;e.getMessage</font><font color="#000000">())</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}&nbsp;</font><font color="#3f7f5f">//go&nbsp;back&nbsp;in&nbsp;loop,&nbsp;wait&nbsp;for&nbsp;next&nbsp;request</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#3f7f5f">//our&nbsp;implementation&nbsp;of&nbsp;the&nbsp;hypertext&nbsp;transfer&nbsp;protocol</font><br>
+        <font color="#3f7f5f">//its&nbsp;very&nbsp;basic&nbsp;and&nbsp;stripped&nbsp;down</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">http_handler</font><font color="#000000">(</font><font color="#000000">BufferedReader&nbsp;input,&nbsp;DataOutputStream&nbsp;output</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">method&nbsp;=&nbsp;</font><font color="#990000">0</font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//1&nbsp;get,&nbsp;2&nbsp;head,&nbsp;0&nbsp;not&nbsp;supported</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">String&nbsp;http&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">String</font><font color="#000000">()</font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//a&nbsp;bunch&nbsp;of&nbsp;strings&nbsp;to&nbsp;hold</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">String&nbsp;path&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">String</font><font color="#000000">()</font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//the&nbsp;various&nbsp;things,&nbsp;what&nbsp;http&nbsp;v,&nbsp;what&nbsp;path,</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">String&nbsp;file&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">String</font><font color="#000000">()</font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//what&nbsp;file</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">String&nbsp;user_agent&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">String</font><font color="#000000">()</font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//what&nbsp;user_agent</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try&nbsp;</b></font><font color="#000000">{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//This&nbsp;is&nbsp;the&nbsp;two&nbsp;types&nbsp;of&nbsp;request&nbsp;we&nbsp;can&nbsp;handle</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//GET&nbsp;/index.html&nbsp;HTTP/1.0</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//HEAD&nbsp;/index.html&nbsp;HTTP/1.0</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">String&nbsp;tmp&nbsp;=&nbsp;input.readLine</font><font color="#000000">()</font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//read&nbsp;from&nbsp;the&nbsp;stream</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">String&nbsp;tmp2&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">String</font><font color="#000000">(</font><font color="#000000">tmp</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">tmp.toUpperCase</font><font color="#000000">()</font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//convert&nbsp;it&nbsp;to&nbsp;uppercase</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">tmp.startsWith</font><font color="#000000">(</font><font color="#2a00ff">"GET"</font><font color="#000000">))&nbsp;{&nbsp;</font><font color="#3f7f5f">//compare&nbsp;it&nbsp;is&nbsp;it&nbsp;GET</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">method&nbsp;=&nbsp;</font><font color="#990000">1</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}&nbsp;</font><font color="#3f7f5f">//if&nbsp;we&nbsp;set&nbsp;it&nbsp;to&nbsp;method&nbsp;1</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">tmp.startsWith</font><font color="#000000">(</font><font color="#2a00ff">"HEAD"</font><font color="#000000">))&nbsp;{&nbsp;</font><font color="#3f7f5f">//same&nbsp;here&nbsp;is&nbsp;it&nbsp;HEAD</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">method&nbsp;=&nbsp;</font><font color="#990000">2</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}&nbsp;</font><font color="#3f7f5f">//set&nbsp;method&nbsp;to&nbsp;2</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">method&nbsp;==&nbsp;</font><font color="#990000">0</font><font color="#000000">)&nbsp;{&nbsp;</font><font color="#3f7f5f">//&nbsp;not&nbsp;supported</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try&nbsp;</b></font><font color="#000000">{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">output.writeBytes</font><font color="#000000">(</font><font color="#000000">construct_http_header</font><font color="#000000">(</font><font color="#990000">501</font><font color="#000000">,&nbsp;</font><font color="#990000">0</font><font color="#000000">))</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">output.close</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Exception&nbsp;e3</font><font color="#000000">)&nbsp;{&nbsp;</font><font color="#3f7f5f">//if&nbsp;some&nbsp;error&nbsp;happened&nbsp;catch&nbsp;it</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s</font><font color="#000000">(</font><font color="#2a00ff">"error:"&nbsp;</font><font color="#000000">+&nbsp;e3.getMessage</font><font color="#000000">())</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}&nbsp;</font><font color="#3f7f5f">//and&nbsp;display&nbsp;error</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//tmp&nbsp;contains&nbsp;"GET&nbsp;/index.html&nbsp;HTTP/1.0&nbsp;......."</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//find&nbsp;first&nbsp;space</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//find&nbsp;next&nbsp;space</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//copy&nbsp;whats&nbsp;between&nbsp;minus&nbsp;slash,&nbsp;then&nbsp;you&nbsp;get&nbsp;"index.html"</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//it's&nbsp;a&nbsp;bit&nbsp;of&nbsp;dirty&nbsp;code,&nbsp;but&nbsp;bear&nbsp;with&nbsp;me...</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">start&nbsp;=&nbsp;</font><font color="#990000">0</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">end&nbsp;=&nbsp;</font><font color="#990000">0</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>for&nbsp;</b></font><font color="#000000">(</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">a&nbsp;=&nbsp;</font><font color="#990000">0</font><font color="#000000">;&nbsp;a&nbsp;&lt;&nbsp;tmp2.length</font><font color="#000000">()</font><font color="#000000">;&nbsp;a++</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">tmp2.charAt</font><font color="#000000">(</font><font color="#000000">a</font><font color="#000000">)&nbsp;</font><font color="#000000">==&nbsp;</font><font color="#990000">'&nbsp;'&nbsp;</font><font color="#000000">&amp;&amp;&nbsp;start&nbsp;!=&nbsp;</font><font color="#990000">0</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">end&nbsp;=&nbsp;a;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>break</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">tmp2.charAt</font><font color="#000000">(</font><font color="#000000">a</font><font color="#000000">)&nbsp;</font><font color="#000000">==&nbsp;</font><font color="#990000">'&nbsp;'&nbsp;</font><font color="#000000">&amp;&amp;&nbsp;start&nbsp;==&nbsp;</font><font color="#990000">0</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">start&nbsp;=&nbsp;a;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">path&nbsp;=&nbsp;tmp2.substring</font><font color="#000000">(</font><font color="#000000">start&nbsp;+&nbsp;</font><font color="#990000">2</font><font color="#000000">,&nbsp;end</font><font color="#000000">)</font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//fill&nbsp;in&nbsp;the&nbsp;path</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Exception&nbsp;e</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s</font><font color="#000000">(</font><font color="#2a00ff">"errorr"&nbsp;</font><font color="#000000">+&nbsp;e.getMessage</font><font color="#000000">())</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}&nbsp;</font><font color="#3f7f5f">//catch&nbsp;any&nbsp;exception</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//path&nbsp;do&nbsp;now&nbsp;have&nbsp;the&nbsp;filename&nbsp;to&nbsp;what&nbsp;to&nbsp;the&nbsp;file&nbsp;it&nbsp;wants&nbsp;to&nbsp;open</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s</font><font color="#000000">(</font><font color="#2a00ff">"\nClient&nbsp;requested:"&nbsp;</font><font color="#000000">+&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">File</font><font color="#000000">(</font><font color="#000000">path</font><font color="#000000">)</font><font color="#000000">.getAbsolutePath</font><font color="#000000">()&nbsp;</font><font color="#000000">+&nbsp;</font><font color="#2a00ff">"\n"</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">FileInputStream&nbsp;requestedfile&nbsp;=&nbsp;</font><font color="#7f0055"><b>null</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try&nbsp;</b></font><font color="#000000">{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//NOTE&nbsp;that&nbsp;there&nbsp;are&nbsp;several&nbsp;security&nbsp;consideration&nbsp;when&nbsp;passing</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//the&nbsp;untrusted&nbsp;string&nbsp;"path"&nbsp;to&nbsp;FileInputStream.</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//You&nbsp;can&nbsp;access&nbsp;all&nbsp;files&nbsp;the&nbsp;current&nbsp;user&nbsp;has&nbsp;read&nbsp;access&nbsp;to!!!</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//current&nbsp;user&nbsp;is&nbsp;the&nbsp;user&nbsp;running&nbsp;the&nbsp;javaprogram.</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//you&nbsp;can&nbsp;do&nbsp;this&nbsp;by&nbsp;passing&nbsp;"../"&nbsp;in&nbsp;the&nbsp;url&nbsp;or&nbsp;specify&nbsp;absoulute&nbsp;path</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//or&nbsp;change&nbsp;drive&nbsp;(win)</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//try&nbsp;to&nbsp;open&nbsp;the&nbsp;file,</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">requestedfile&nbsp;=&nbsp;</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">FileInputStream</font><font color="#000000">(</font><font color="#000000">path</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Exception&nbsp;e</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try&nbsp;</b></font><font color="#000000">{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//if&nbsp;you&nbsp;could&nbsp;not&nbsp;open&nbsp;the&nbsp;file&nbsp;send&nbsp;a&nbsp;404</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">output.writeBytes</font><font color="#000000">(</font><font color="#000000">construct_http_header</font><font color="#000000">(</font><font color="#990000">404</font><font color="#000000">,&nbsp;</font><font color="#990000">0</font><font color="#000000">))</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//close&nbsp;the&nbsp;stream</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">output.close</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Exception&nbsp;e2</font><font color="#000000">)&nbsp;{}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s</font><font color="#000000">(</font><font color="#2a00ff">"error"&nbsp;</font><font color="#000000">+&nbsp;e.getMessage</font><font color="#000000">())</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}&nbsp;</font><font color="#3f7f5f">//print&nbsp;error&nbsp;to&nbsp;gui</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//happy&nbsp;day&nbsp;scenario</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>try&nbsp;</b></font><font color="#000000">{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">type_is&nbsp;=&nbsp;</font><font color="#990000">0</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//find&nbsp;out&nbsp;what&nbsp;the&nbsp;filename&nbsp;ends&nbsp;with,</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//so&nbsp;you&nbsp;can&nbsp;construct&nbsp;a&nbsp;the&nbsp;right&nbsp;content&nbsp;type</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">path.endsWith</font><font color="#000000">(</font><font color="#2a00ff">".zip"</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000"> &nbsp; </font><font color="#000000"> </font><font color="#000000"> )&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">type_is&nbsp;=&nbsp;</font><font color="#990000">3</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">path.endsWith</font><font color="#000000">(</font><font color="#2a00ff">".jpg"</font><font color="#000000">)&nbsp;</font><font color="#000000">||&nbsp;path.endsWith</font><font color="#000000">(</font><font color="#2a00ff">".jpeg"</font><font color="#000000">))&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">type_is&nbsp;=&nbsp;</font><font color="#990000">1</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">path.endsWith</font><font color="#000000">(</font><font color="#2a00ff">".gif"</font><font color="#000000">))&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">type_is&nbsp;=&nbsp;</font><font color="#990000">2</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//write&nbsp;out&nbsp;the&nbsp;header,&nbsp;200&nbsp;-&gt;everything&nbsp;is&nbsp;ok&nbsp;we&nbsp;are&nbsp;all&nbsp;happy.</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">output.writeBytes</font><font color="#000000">(</font><font color="#000000">construct_http_header</font><font color="#000000">(</font><font color="#990000">200</font><font color="#000000">,&nbsp;</font><font color="#990000">5</font><font color="#000000">))</font><font color="#000000">;</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//if&nbsp;it&nbsp;was&nbsp;a&nbsp;HEAD&nbsp;request,&nbsp;we&nbsp;don't&nbsp;print&nbsp;any&nbsp;BODY</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">method&nbsp;==&nbsp;</font><font color="#990000">1</font><font color="#000000">)&nbsp;{&nbsp;</font><font color="#3f7f5f">//1&nbsp;is&nbsp;GET&nbsp;2&nbsp;is&nbsp;head&nbsp;and&nbsp;skips&nbsp;the&nbsp;body</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>while&nbsp;</b></font><font color="#000000">(</font><font color="#7f0055"><b>true</b></font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//read&nbsp;the&nbsp;file&nbsp;from&nbsp;filestream,&nbsp;and&nbsp;print&nbsp;out&nbsp;through&nbsp;the</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//client-outputstream&nbsp;on&nbsp;a&nbsp;byte&nbsp;per&nbsp;byte&nbsp;base.</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">b&nbsp;=&nbsp;requestedfile.read</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if&nbsp;</b></font><font color="#000000">(</font><font color="#000000">b&nbsp;==&nbsp;-</font><font color="#990000">1</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>break</b></font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//end&nbsp;of&nbsp;file</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">output.write</font><font color="#000000">(</font><font color="#000000">b</font><font color="#000000">)</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}<br>
+        </font><font color="#3f7f5f">//clean&nbsp;up&nbsp;the&nbsp;files,&nbsp;close&nbsp;open&nbsp;handles</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">output.close</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">requestedfile.close</font><font color="#000000">()</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>catch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">Exception&nbsp;e</font><font color="#000000">)&nbsp;{}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">//this&nbsp;method&nbsp;makes&nbsp;the&nbsp;HTTP&nbsp;header&nbsp;for&nbsp;the&nbsp;response</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">//the&nbsp;headers&nbsp;job&nbsp;is&nbsp;to&nbsp;tell&nbsp;the&nbsp;browser&nbsp;the&nbsp;result&nbsp;of&nbsp;the&nbsp;request</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#3f7f5f">//among&nbsp;if&nbsp;it&nbsp;was&nbsp;successful&nbsp;or&nbsp;not.</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#000000">String&nbsp;construct_http_header</font><font color="#000000">(</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">return_code,&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">file_type</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">String&nbsp;s&nbsp;=&nbsp;</font><font color="#2a00ff">"HTTP/1.0&nbsp;"</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//you&nbsp;probably&nbsp;have&nbsp;seen&nbsp;these&nbsp;if&nbsp;you&nbsp;have&nbsp;been&nbsp;surfing&nbsp;the&nbsp;web&nbsp;a&nbsp;while</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>switch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">return_code</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>case&nbsp;</b></font><font color="#990000">200</font><font color="#000000">:</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"200&nbsp;OK"</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>break</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>case&nbsp;</b></font><font color="#990000">400</font><font color="#000000">:</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"400&nbsp;Bad&nbsp;Request"</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>break</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>case&nbsp;</b></font><font color="#990000">403</font><font color="#000000">:</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"403&nbsp;Forbidden"</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>break</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>case&nbsp;</b></font><font color="#990000">404</font><font color="#000000">:</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"404&nbsp;Not&nbsp;Found"</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>break</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>case&nbsp;</b></font><font color="#990000">500</font><font color="#000000">:</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"500&nbsp;Internal&nbsp;Server&nbsp;Error"</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>break</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>case&nbsp;</b></font><font color="#990000">501</font><font color="#000000">:</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"501&nbsp;Not&nbsp;Implemented"</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>break</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"\r\n"</font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//other&nbsp;header&nbsp;fields,</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"Connection:&nbsp;close\r\n"</font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//we&nbsp;can't&nbsp;handle&nbsp;persistent&nbsp;connections</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"Server:&nbsp;SimpleHTTPtutorial&nbsp;v0\r\n"</font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//server&nbsp;name</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//Construct&nbsp;the&nbsp;right&nbsp;Content-Type&nbsp;for&nbsp;the&nbsp;header.</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//This&nbsp;is&nbsp;so&nbsp;the&nbsp;browser&nbsp;knows&nbsp;what&nbsp;to&nbsp;do&nbsp;with&nbsp;the</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//file,&nbsp;you&nbsp;may&nbsp;know&nbsp;the&nbsp;browser&nbsp;dosen't&nbsp;look&nbsp;on&nbsp;the&nbsp;file</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//extension,&nbsp;it&nbsp;is&nbsp;the&nbsp;servers&nbsp;job&nbsp;to&nbsp;let&nbsp;the&nbsp;browser&nbsp;know</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//what&nbsp;kind&nbsp;of&nbsp;file&nbsp;is&nbsp;being&nbsp;transmitted.&nbsp;You&nbsp;may&nbsp;have&nbsp;experienced</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//if&nbsp;the&nbsp;server&nbsp;is&nbsp;miss&nbsp;configured&nbsp;it&nbsp;may&nbsp;result&nbsp;in</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//pictures&nbsp;displayed&nbsp;as&nbsp;text!</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>switch&nbsp;</b></font><font color="#000000">(</font><font color="#000000">file_type</font><font color="#000000">)&nbsp;{</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//plenty&nbsp;of&nbsp;types&nbsp;for&nbsp;you&nbsp;to&nbsp;fill&nbsp;in</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>case&nbsp;</b></font><font color="#990000">0</font><font color="#000000">:</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>break</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>case&nbsp;</b></font><font color="#990000">1</font><font color="#000000">:</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"Content-Type:&nbsp;image/jpeg\r\n"</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>break</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>case&nbsp;</b></font><font color="#990000">2</font><font color="#000000">:</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"Content-Type:&nbsp;image/gif\r\n"</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>case&nbsp;</b></font><font color="#990000">3</font><font color="#000000">:</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"Content-Type:&nbsp;application/x-zip-compressed\r\n"</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>default</b></font><font color="#000000">:</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"Content-Type:&nbsp;text/html\r\n"</font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>break</b></font><font color="#000000">;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">////so&nbsp;on&nbsp;and&nbsp;so&nbsp;on......</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">s&nbsp;=&nbsp;s&nbsp;+&nbsp;</font><font color="#2a00ff">"\r\n"</font><font color="#000000">;&nbsp;</font><font color="#3f7f5f">//this&nbsp;marks&nbsp;the&nbsp;end&nbsp;of&nbsp;the&nbsp;httpheader</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//and&nbsp;the&nbsp;start&nbsp;of&nbsp;the&nbsp;body</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//ok&nbsp;return&nbsp;our&nbsp;newly&nbsp;created&nbsp;header!</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">s;</font><br>
+        <font color="#ffffff">&nbsp;&nbsp;</font><font color="#000000">}</font><br>
+        <font color="#ffffff"></font><br>
+        <font color="#000000">}&nbsp;</font><font color="#3f7f5f">//class&nbsp;phhew&nbsp;caffeine&nbsp;yes&nbsp;please!</font></code> 
+      </td> 
+      </tr>
+    </tbody></table>
+    </p>
+
+    <p><b><font size="+1">BEWARE! When you run the web server you
+    are potentially opening for all your files to be red by the entire
+    Internet! The httpserver is only ment to be used for testing.
+    If you absoulutely want to run this httpserver for longer periods
+    of time; consider creating a new user with only read access to
+    the files you want to share and running it only with this user!</font></b></p>
+
+    <p><a href="http://turtlemeat.com/makingawebserver/TurtleMeatSimpleHttpServer.zip.zip">Download
+    the tutorial files!</a><b><font size="+1">&nbsp; </font></b>this
+    zipfile contains both sourcecode and compiled javabytecode files.
+    So you can test the program without having the javacompiler.
+    It also contains a sample index.html and a jpg file.</p>
+
+    <p>How to run the program? Get into commandline, cd to the dir
+    where you extracted the files (webserver_starter.class and the
+    other files). Then type: java webserver_starter</p>
+
+    <p>Then the window you see on top of this page should pop up.
+    To test if this httpserver is really functioning, you open your
+    browser, and in the location line you type: http://localhost/index.html
+    ,this will bring up a sample html file that is in the zipfile.</p>
+
+    <p>If you want to test the httpserver from another machine on
+    the Internet, then you need to know the ip-address or hostname
+    the httpserver is running on, then you type that in the location
+    line in the browser, like http://123.123.123.123/index.html .Note,
+    it may not work if you are behind a firewall or a NAT router,
+    but that's not the programs' fault!</p>
+
+    <p>Update: Oct 2011. This code is not actively updated, but I changed a few
+    things mainly due to many people are referencing this. The switch (file_type) was
+    missing breaks.  requestedfile.read() and output.write() now reads and writes a byte array which speeds things up.
+    And added favicon support since somebody asked about it.  </p>
+    <p>How to compile: Open command line. cd to directory where you unpacked it. javac *.java<br>
+    How to run: Open command line. cd to directory where you unpacked it. java -cp . webserver_starter</p>
+
+    <p>&nbsp;</p>
+
+    <p>&nbsp;</p>
+
+    <p><b><font size="+1">Pointers to related stuff on the hypertext
+    transfer protocol (http) and web servers:</font></b></p>
+
+    <p><a href="http://turtlemeat.com/2.php?l=www.howstuffworks.com/web-server.htm">HowStuffWorks</a>
+    This is a very basic introduction for the novice on how web servers
+    works. Has also other text about Internet and Routers, in easy
+    to understandable language. Nice if you are starting out learning.</p>
+
+    <p><a href="http://turtlemeat.com/2.php?l=www.jmarshall.com/easy/http/">HTTP Made Really
+    Easy</a> Here is some nice text that goes through the main points
+    in HTTP. A little more technical. It's recommended that you know
+    these things to understand the above tutorial.<br>
+<br>
+    <a href="http://turtlemeat.com/2.php?l=www.apache.org/">Apache</a> the best and most
+    widely used web server on the Internet today, check it out. If
+    you want to run your own web server this is the one to get, you
+    can get binaries for both Windows and Unix. You can download
+    the entire sourcecode if you want to check how it was made.</p>
+
+    <p><a href="http://turtlemeat.com/2.php?l=www.mozilla.org/">Mozilla</a> / Netscape is
+    a nice web browser. Get rid of the Explorer, there are some rumors
+    that Internet Explorer secretly collects all the pages you are
+    visiting and sends it to microsoft.com.</p>
+
+    <p><a href="ftp://ftp.rfc-editor.org/in-notes/rfc1945.txt">RFC-1945</a>
+    RFC describing Hypertext Transfer Protocol -- HTTP/1.0</p>
+
+          <p><a href="ftp://ftp.rfc-editor.org/in-notes/rfc2616.txt">RFC-2616</a> 
+            RFC describing Hypertext Transfer Protocol -- HTTP/1.1</p>
+
+    <p><a href="http://turtlemeat.com/2.php?l=www.rfc-editor.org/rfcsearch.html">RFC webpage</a>
+    The Request For Comment webpage, RFC are technical documents
+    describing all sorts of protocols on the Internet.</p>
+
+    <p><a href="http://turtlemeat.com/2.php?l=java.sun.com/j2se/1.4/download.html">Java2
+    Runtime / SDK</a> Download site for the Java Runtime (needed
+    for running Java programs) and Java Software Development Kit
+    (needed for making Java programs).</p>
+
+    <p>&nbsp;</p>
+
+<p></p> 
+<p align="left"> <strong>
+
+  <br><br>
+<script type="text/javascript"><!--
+google_ad_client = "pub-5144998296566996";
+/* 300x250, created 3/21/11 */
+google_ad_slot = "5611089128";
+google_ad_width = 300;
+google_ad_height = 250;
+//-->
+</script>
+<script type="text/javascript" src="javawebserver.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:250px;margin:0;padding:0;position:relative;visibility:visible;width:300px"><ins id="aswift_1_anchor" style="display:block;border:none;height:250px;margin:0;padding:0;position:relative;visibility:visible;width:300px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_1" name="aswift_1" style="left: 0px; position: absolute; top: 0px;" frameborder="0" height="250" scrolling="no" width="300"></iframe></ins></ins>
+</strong></p><p><strong>
+Linux<br>
+<a href="http://fragments.turtlemeat.com/setup-software-raid-1-with-lvm.php">Setup Software Raid 1 with LVM</a><br>
+<a href="http://fragments.turtlemeat.com/use-linux-as-desktop-pc-instead-of-windows.php">Setup Linux with Desktop</a><br>
+</strong></p><strong>
+<p>Google<br>
+  <a href="http://fragments.turtlemeat.com/get-started-with-dfp-doubleclick-for-publishers.php">Manage your website ads with DFP</a><br>
+  <a href="http://fragments.turtlemeat.com/experience-with-google-adsense-for-domains.php">Google AdSense for Domains - not so great</a><br>
+  <a href="http://fragments.turtlemeat.com/use-google-email-on-your-domain-name.php">Let Google Handle Email for your Domain Name</a><br>
+  <a href="http://fragments.turtlemeat.com/pr-banned-google.php">Page Rank banned by Google</a><br>
+  <a href="http://fragments.turtlemeat.com/popular-google.php">Google's highest ranked web pages </a><br>
+  <a href="http://fragments.turtlemeat.com/seo-pagerank-google-anchor-text.php">SEO intelligent spam causes irrelevant search results</a><br>
+  <a href="http://fragments.turtlemeat.com/google-sandbox-effect.php">Google Sandbox</a><br>
+  <a href="http://fragments.turtlemeat.com/google-search-ranking-factors-optimize.php">Google ranking factors </a><br>
+  <a href="http://fragments.turtlemeat.com/how-to-not-pass-page-rank-in-links.php">How to not give out page rank in web page links</a></p>
+<p>Amazon<br>
+  <a href="http://fragments.turtlemeat.com/getting-started-with-amazon-cloudfront.php">Amazon Cloudfront versus Shared Hosting</a><br>
+</p><p>Web Server Programming<br>
+  <a href="http://fragments.turtlemeat.com/javawebserver.php">Simple Java web server</a><br>
+  <a href="http://fragments.turtlemeat.com/pythonwebserver.php">Simple Python web server</a><br>
+  <a href="http://fragments.turtlemeat.com/htaccess.php">Configuring Apache webserver with .htaccess file</a></p>
+<p>Windows<a href="http://fragments.turtlemeat.com/dotnetinstall.php"><br>
+Turn off the loginscreen in XP, after installing .NET . </a><a href="http://fragments.turtlemeat.com/dotnet.php"><br>
+</a><a href="http://fragments.turtlemeat.com/turn-off-xp-login-screen-unread-mail-count.php">Turn off xp login screen unread mail count</a><a href="http://fragments.turtlemeat.com/dotnet.php"><br>
+What is .NET</a></p>
+<p>Web (webmastering) <br>
+<a href="http://fragments.turtlemeat.com/css.php">Introduction to Cascading style sheets (CSS)</a><br>
+<a href="http://fragments.turtlemeat.com/alexa_traffic_rank.php">The value of Alexa traffic rank</a><br>
+<a href="http://fragments.turtlemeat.com/meta-tag-html-code-syntax.php">HTML META tag, not a search engine optimization tool</a><br>
+<a href="http://fragments.turtlemeat.com/how-create-maintainable-web-pages-modularization-php-asp.php">Create a maintainable webpage with modularization</a><br>
+<a href="http://fragments.turtlemeat.com/www-domain-name-configuration.php">The www prefix in your domain name</a><br>
+<a href="http://fragments.turtlemeat.com/RSS-RSS-what-use-how.php">What is RSS and cool things RSS can be used for </a><br> 
+<a href="http://fragments.turtlemeat.com/mysql-database-backup-restore-phpmyadmin.php">MySql backup and restore with phpMyAdmin </a></p>
+<p>Mix Computer related text<br>
+<a href="http://fragments.turtlemeat.com/investing-information-technology-economy-ebiz.php">Doing business (making money) with Information Technology</a><br>
+<a href="http://fragments.turtlemeat.com/computer-science-business.php">Business with Computer Science</a><br>
+<a href="http://fragments.turtlemeat.com/computer-science-research.php">Research in Computer Science</a><br>
+<a href="http://fragments.turtlemeat.com/medical-informatics/medical-informatics-table-of-content.php">Current and future possibilities of Medical Informatics</a><br>
+
+<a href="http://fragments.turtlemeat.com/things-to-program.php">Tasks that make sense to have automated</a><br>
+<a href="http://fragments.turtlemeat.com/handheld-mobile-programming/handheld-mobile-programming.php">Programming handheld mobile devices</a> (overview)<br>
+<a href="http://fragments.turtlemeat.com/web-security-privacy.php">Security tips for the web surfer</a><br>
+<a href="http://fragments.turtlemeat.com/harddrive.php">Price and Capacity in computer hardware</a><br>
+<a href="http://fragments.turtlemeat.com/rmi.php">Java RMI Tutorial. </a></p>
+<p>Microsoft Word<br>
+  <a href="http://fragments.turtlemeat.com/word/page-numbering-in-word.php">Page numbering in Word</a> <br>
+  <a href="http://fragments.turtlemeat.com/word/numbering-headers-outlines.php">Numbering headers or outlines in Word </a><br>
+  <a href="http://fragments.turtlemeat.com/word/creating-list-of-figures-captions.php">Create a List of Figures
+  </a><br>
+  <a href="http://fragments.turtlemeat.com/word/show-full-menus-word.php">Turn off the default collapsing menus in Word
+</a></p>
+  </strong> 
+ 
+  <br>
+  <br>
+  <br>
+
+  <p></p> <div id="hr"></div>  <p><a href="http://turtlemeat.com/">Turtlmeat.com 2004-2011</a> ©</p>
+      </td>
+  </tr>
+</tbody></table>
+
+
+
+
+</body></html>

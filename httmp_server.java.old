@@ -1,0 +1,174 @@
+import java.io.*;
+import java.lang.*;
+import java.net.*;
+import java.util.*;
+
+public class httmp_server {
+	
+	public static void main(String args[]) throws FileNotFoundException, IOException 	{
+		System.out.println("Startup initiated");
+		new serve();
+		new serve();
+		new serve();
+	}
+
+	private class serve extends Thread {
+	
+		// constructor:
+	
+		serve() {
+			File log = new File("log.dat");
+			if (log.exists()) {
+    	    	System.out.println("Logfile exists.");
+    	    }
+    	    else {
+    	    	log.createNewFile();
+    	    }
+			System.out.println("Serving...");
+			start();
+		}
+	
+		// printing log:
+	
+		public void printLog(String data) {
+			data = data + "\n";
+			FileOutputStream log;
+			PrintStream p;
+			try {
+				log = new FileOutputStream("log.sfra");
+				p = new PrintStream(log);
+				p.println(data);
+				p.close();
+			}
+			catch (Exception e) {
+				System.err.println ("WriteError: log: " + e);
+			}
+		}
+		
+		// main thread entry point:
+		
+		public void run() {
+			
+			final double gameHertz = 100.0;
+			final double timeBetweenUpdates = 1000000 / gameHertz;
+			final int maxUpdatesBeforeRuntime = 20;
+			double lastUpdateTime = System.nanoTime();
+			double lastRuntime = System.nanoTime();
+			final double targetFPS = 40;
+			final double targetTimeBetweenRuntimes = 1000000000 / targetFPS;
+			int lastSecondTime = (int) (lastUpdateTime / 1000000000);
+			boolean looping = true;
+			try{
+				server = new ServerSocket(1042); 
+			}
+			catch (IOException e) {
+				printLog("LISTEN FAIL on 1042: " + e);	
+				System.err.println("Could not listen on port 1042.");
+				System.exit(-1);
+			}
+			while(looping) {
+				double now = System.nanoTime();
+				int updateCount = 0;
+				while( now - lastUpdateTime > timeBetweenUpdates && updateCount < maxUpdatesBeforeRuntime ) 
+				{
+					runServer();
+					lastUpdateTime += timeBetweenUpdates;
+					updateCount++;
+				}
+				if ( now - lastUpdateTime > timeBetweenUpdates)
+				{
+					lastUpdateTime = now - timeBetweenUpdates;
+				}
+				while ( now - lastRenderTime < targetTimeBetweenRenders && now - lastUpdateTime < timeBetweenUpdates)
+				{
+					Thread.yield();
+					try {
+						Thread.sleep(1);
+					} catch(Exception e) {} 
+					now = System.nanoTime();
+				}
+			}
+		}
+			
+		private void runServer() {
+			try{
+				client = server.accept();
+				printLog("ACCEPT on 1042: " + client);
+				System.out.println(client);
+			}
+			catch (IOException e) {
+				printLog("ACCEPT FAIL on 1042: " + e);	
+				System.err.println("Accept failed: 1042");
+			}
+			try{
+				inComing = new BufferedReader(new InputStreamReader(client.getInputStream()));
+				outGoing = new PrintWriter(client.getOutputStream(), true);
+			}
+			catch (IOException e) {
+				printLog("READ FAIL on 1042: " + e);
+				System.err.println("Read failed");
+				System.exit(-1);
+			}
+			
+			try{
+				clientData = inComing.readLine();	
+				if (clientData.equals(null)) {
+					System.err.println("NULL INPUT");
+					outGoing.println("ILLEGAL INPUT: NULL");
+				}
+				else {
+					System.out.println(clientData);
+					processingUnit(clientData, client);
+				}
+			}
+			catch (IOException e) {
+				printLog("READ FAIL on 1042: " + e);
+				System.out.println("Read failed");
+				System.exit(-1);
+			}
+		}
+		
+		public void processingUnit(clientData, client) {
+			String commandType = clientData.substring(0,2);
+			if (commandType == "GET") {
+				int posDot = clientData.indexOf(".");
+				int posSpa = clientData.indexOf(" ",posDot);
+				String filetype = clientData.substring(posDot,posSpa);
+				String location = clientData.substring(3,posSpa);
+				if (filetype == ".jpg") {
+				}
+				if (filetype == ".txt") {
+					FileInputStream requestedFile = new FileInputStream(location);
+					DataInputStream in = new DataInputStream(fstream);
+  					BufferedReader br = new BufferedReader(new InputStreamReader(in));
+  					String currentLine;
+					try {
+						while ((strLine = br.readLine()) != null) {
+							outGoing.println (strLine);
+						}
+						p.close();
+					}
+					catch (Exception e) {
+						System.err.println ("WriteError: " + e);
+						printLog("WriteError: " + e);
+					}
+				}
+				else {
+					outGoing.println("ILLEGAL FILETYPE");
+					printLog("Illegal filetype requested");
+					System.error.println("Illegal filetype requested");
+				}
+			}
+		}
+		
+		private BufferedReader inComing;
+		private PrintWriter outGoing;
+		
+		private ServerSocket server;
+		private Socket client;
+	}
+		
+		private String clientData;
+	}
+}
+

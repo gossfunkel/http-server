@@ -1,0 +1,967 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 4.0//EN">
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <title>HTML output</title>
+    <link rel="STYLESHEET" href="webservsrc_files/c.html" type="text/css">
+    <meta http-equiv="generator" content="ctohtml">
+</head>
+
+<body>
+
+
+<!--  webserv.c  -->
+
+<h2>webserv.c</h2>
+
+<br>
+
+<pre><span class="comment">/*
+
+  WEBSERV.C
+  =========
+  (c) Copyright Paul Griffiths 1999
+  Email: mail@paulgriffiths.net
+
+  A simple web server
+
+*/</span>
+
+
+<span class="keyword">#include</span> &lt;sys/socket.h&gt;       <span class="comment">/*  socket definitions        */</span>
+<span class="keyword">#include</span> &lt;sys/types.h&gt;        <span class="comment">/*  socket types              */</span>
+<span class="keyword">#include</span> &lt;sys/wait.h&gt;         <span class="comment">/*  for waitpid()             */</span>
+<span class="keyword">#include</span> &lt;arpa/inet.h&gt;        <span class="comment">/*  inet (3) funtions         */</span>
+<span class="keyword">#include</span> &lt;unistd.h&gt;           <span class="comment">/*  misc. UNIX functions      */</span>
+
+<span class="keyword">#include</span> &lt;stdio.h&gt;
+<span class="keyword">#include</span> &lt;stdlib.h&gt;
+
+<span class="keyword">#include</span> "helper.h"
+<span class="keyword">#include</span> "servreq.h"
+
+<span class="keyword">#define</span> SERVER_PORT            (8080)
+
+
+<span class="comment">/*  main() funcion  */</span>
+
+<span class="keyword">int</span> main(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[]) {
+
+    <span class="keyword">int</span>    listener, conn;
+    pid_t  pid;
+    <span class="keyword">struct</span> sockaddr_in servaddr;
+    
+
+    <span class="comment">/*  Create socket  */</span>
+
+    <span class="keyword">if</span> ( (listener = socket(AF_INET, SOCK_STREAM, 0)) &lt; 0 )
+	Error_Quit("Couldn't create listening socket.");
+
+
+    <span class="comment">/*  Populate socket address structure  */</span>
+
+    memset(&amp;servaddr, 0, <span class="keyword">sizeof</span>(servaddr));
+    servaddr.sin_family      = AF_INET;
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr.sin_port        = htons(SERVER_PORT);
+
+
+    <span class="comment">/*  Assign socket address to socket  */</span> 
+
+    <span class="keyword">if</span> ( bind(listener, (<span class="keyword">struct</span> sockaddr *) &amp;servaddr, <span class="keyword">sizeof</span>(servaddr)) &lt; 0 )
+	Error_Quit("Couldn't bind listening socket.");
+
+
+    <span class="comment">/*  Make socket a listening socket  */</span>
+
+    <span class="keyword">if</span> ( listen(listener, LISTENQ) &lt; 0 )
+	Error_Quit("Call to listen failed.");
+
+
+    <span class="comment">/*  Loop infinitely to accept and service connections  */</span>
+
+    <span class="keyword">while</span> ( 1 ) {
+
+	<span class="comment">/*  Wait for connection  */</span>
+
+	<span class="keyword">if</span> ( (conn = accept(listener, NULL, NULL)) &lt; 0 )
+	    Error_Quit("Error calling accept()");
+
+
+	<span class="comment">/*  Fork child process to service connection  */</span>
+
+	<span class="keyword">if</span> ( (pid = fork()) == 0 ) {
+
+	    <span class="comment">/*  This is now the forked child process, so
+		close listening socket and service request   */</span>
+
+	    <span class="keyword">if</span> ( close(listener) &lt; 0 )
+		Error_Quit("Error closing listening socket in child.");
+	    
+	    Service_Request(conn);
+
+
+	    <span class="comment">/*  Close connected socket and exit  */</span>
+
+	    <span class="keyword">if</span> ( close(conn) &lt; 0 )
+		Error_Quit("Error closing connection socket.");
+	    exit(EXIT_SUCCESS);
+	}
+
+
+	<span class="comment">/*  If we get here, we are still in the parent process,
+	    so close the connected socket, clean up child processes,
+	    and go back to accept a new connection.                   */</span>
+
+	<span class="keyword">if</span> ( close(conn) &lt; 0 )
+	    Error_Quit("Error closing connection socket in parent.");
+
+	waitpid(-1, NULL, WNOHANG);
+    }
+
+    <span class="keyword">return</span> EXIT_FAILURE;    <span class="comment">/*  We shouldn't get here  */</span>
+}
+</pre>
+
+<br><hr><br>
+
+
+<!--  servreq.h  -->
+
+<h2>servreq.h</h2>
+
+<br>
+
+<pre><span class="comment">/*
+
+  SERVREQ.H
+  =========
+  (c) Copyright Paul Griffiths 1999
+  Email: mail@paulgriffiths.net
+
+  Interface to function to server connections.
+
+*/</span>
+
+
+<span class="keyword">#ifndef</span> PG_SERVREQ_H
+<span class="keyword">#define</span> PG_SERVREQ_H
+
+
+<span class="comment">/*  Function prototypes  */</span>
+
+<span class="keyword">int</span> Service_Request(<span class="keyword">int</span> conn);
+
+
+<span class="keyword">#endif</span>  <span class="comment">/*  PG_SERVREQ_H  */</span>
+
+</pre>
+
+<br><hr><br>
+
+
+<!--  servreq.c  -->
+
+<h2>servreq.c</h2>
+
+<br>
+
+<pre><span class="comment">/*
+
+  SERVREQ.C
+  =========
+  (c) Copyright Paul Griffiths 1999
+  Email: mail@paulgriffiths.net
+
+  Implementation of function to service requests.
+
+*/</span>
+
+
+<span class="keyword">#include</span> &lt;stdio.h&gt;
+<span class="keyword">#include</span> &lt;errno.h&gt;
+
+<span class="keyword">#include</span> "helper.h"
+<span class="keyword">#include</span> "reqhead.h"
+<span class="keyword">#include</span> "resphead.h"
+<span class="keyword">#include</span> "resource.h"
+
+
+<span class="comment">/*  Service an HTTP request  */</span>
+
+<span class="keyword">int</span> Service_Request(<span class="keyword">int</span> conn) {
+
+    <span class="keyword">struct</span> ReqInfo  reqinfo;
+    <span class="keyword">int</span>             resource = 0;
+
+    InitReqInfo(&amp;reqinfo);
+
+    
+    <span class="comment">/*  Get HTTP request  */</span>
+
+    <span class="keyword">if</span> ( Get_Request(conn, &amp;reqinfo) &lt; 0 )
+	<span class="keyword">return</span> -1;
+
+    
+    <span class="comment">/*  Check whether resource exists, whether we have permission
+	to access it, and update status code accordingly.          */</span>
+
+    <span class="keyword">if</span> ( reqinfo.status == 200 )
+	<span class="keyword">if</span> ( (resource = Check_Resource(&amp;reqinfo)) &lt; 0 ) {
+	    <span class="keyword">if</span> ( errno == EACCES )
+		reqinfo.status = 401;
+	    <span class="keyword">else</span>
+		reqinfo.status = 404;
+	}
+
+    <span class="comment">/*  Output HTTP response headers if we have a full request  */</span>
+
+    <span class="keyword">if</span> ( reqinfo.type == FULL )
+	Output_HTTP_Headers(conn, &amp;reqinfo);
+
+
+    <span class="comment">/*  Service the HTTP request  */</span>
+
+    <span class="keyword">if</span> ( reqinfo.status == 200 ) {
+	<span class="keyword">if</span> ( Return_Resource(conn, resource, &amp;reqinfo) )
+	    Error_Quit("Something wrong returning resource.");
+    }
+    <span class="keyword">else</span>
+	Return_Error_Msg(conn, &amp;reqinfo);
+
+    <span class="keyword">if</span> ( resource &gt; 0 )
+	<span class="keyword">if</span> ( close(resource) &lt; 0 )
+	    Error_Quit("Error closing resource.");
+    FreeReqInfo(&amp;reqinfo);
+
+    <span class="keyword">return</span> 0;
+}
+
+</pre>
+
+<br><hr><br>
+
+
+<!--  reqhead.h  -->
+
+<h2>reqhead.h</h2>
+
+<br>
+
+<pre><span class="comment">/*
+
+  REQHEAD.H
+  =========
+  (c) Copyright Paul Griffiths 1999
+  Email: mail@paulgriffiths.net
+
+  Interface to functions for manipulating HTTP request headers.
+
+*/</span>
+
+
+<span class="keyword">#ifndef</span> PG_REQHEAD_H
+<span class="keyword">#define</span> PG_REQHEAD_H
+
+
+<span class="comment">/*  User-defined data types  */</span>
+
+<span class="keyword">enum</span> Req_Method { GET, HEAD, UNSUPPORTED };
+<span class="keyword">enum</span> Req_Type   { SIMPLE, FULL };
+
+<span class="keyword">struct</span> ReqInfo {
+    <span class="keyword">enum</span> Req_Method method;
+    <span class="keyword">enum</span> Req_Type   type;
+    <span class="keyword">char</span>           *referer;
+    <span class="keyword">char</span>           *useragent;
+    <span class="keyword">char</span>           *resource;
+    <span class="keyword">int</span>             status;
+};
+
+
+<span class="comment">/*  Global macros/variables  */</span>
+
+<span class="keyword">#define</span> MAX_REQ_LINE         (1024)
+
+
+<span class="comment">/*  Function prototypes  */</span>
+
+<span class="keyword">int</span>  Parse_HTTP_Header(<span class="keyword">char</span> * buffer, <span class="keyword">struct</span> ReqInfo * reqinfo);
+<span class="keyword">int</span>  Get_Request      (<span class="keyword">int</span> conn, <span class="keyword">struct</span> ReqInfo * reqinfo);
+<span class="keyword">void</span> InitReqInfo      (<span class="keyword">struct</span> ReqInfo * reqinfo);
+<span class="keyword">void</span> FreeReqInfo      (<span class="keyword">struct</span> ReqInfo * reqinfo);
+
+<span class="keyword">#endif</span>  <span class="comment">/*  PG_REQHEAD_H  */</span>
+</pre>
+
+<br><hr><br>
+
+
+<!--  reqhead.c  -->
+
+<h2>reqhead.c</h2>
+
+<br>
+
+<pre><span class="comment">/*
+
+  REQHEAD.C
+  =========
+  (c) Copyright Paul Griffiths 1999
+  Email: mail@paulgriffiths.net
+
+  Implementation of functions to manipulate HTTP request headers.
+
+*/</span>
+
+
+<span class="keyword">#include</span> &lt;sys/time.h&gt;             <span class="comment">/*  For select()  */</span>
+
+<span class="keyword">#include</span> &lt;stdlib.h&gt;
+<span class="keyword">#include</span> &lt;string.h&gt;
+<span class="keyword">#include</span> &lt;ctype.h&gt;
+
+<span class="keyword">#include</span> "reqhead.h"
+<span class="keyword">#include</span> "servreq.h"
+<span class="keyword">#include</span> "helper.h"
+
+
+<span class="comment">/*  Parses a string and updates a request
+    information structure if necessary.    */</span>
+
+<span class="keyword">int</span> Parse_HTTP_Header(<span class="keyword">char</span> * buffer, <span class="keyword">struct</span> ReqInfo * reqinfo) {
+
+    <span class="keyword">static</span> <span class="keyword">int</span> first_header = 1;
+    <span class="keyword">char</span>      *temp;
+    <span class="keyword">char</span>      *endptr;
+    <span class="keyword">int</span>        len;
+
+
+    <span class="keyword">if</span> ( first_header == 1 ) {
+
+	<span class="comment">/*  If first_header is 0, this is the first line of
+	    the HTTP request, so this should be the request line.  */</span>
+
+
+	<span class="comment">/*  Get the request method, which is case-sensitive. This
+	    version of the server only supports the GET and HEAD
+	    request methods.                                        */</span>
+
+	<span class="keyword">if</span> ( !strncmp(buffer, "GET ", 4) ) {
+	    reqinfo-&gt;method = GET;
+	    buffer += 4;
+	}
+	<span class="keyword">else</span> <span class="keyword">if</span> ( !strncmp(buffer, "HEAD ", 5) ) {
+	    reqinfo-&gt;method = HEAD;
+	    buffer += 5;
+	}
+	<span class="keyword">else</span> {
+	    reqinfo-&gt;method = UNSUPPORTED;
+	    reqinfo-&gt;status = 501;
+	    <span class="keyword">return</span> -1;
+	}
+
+
+	<span class="comment">/*  Skip to start of resource  */</span>
+
+	<span class="keyword">while</span> ( *buffer &amp;&amp; isspace(*buffer) )
+	    buffer++;
+
+
+	<span class="comment">/*  Calculate string length of resource...  */</span>
+
+	endptr = strchr(buffer, ' ');
+	<span class="keyword">if</span> ( endptr == NULL )
+	    len = strlen(buffer);
+	<span class="keyword">else</span>
+	    len = endptr - buffer;
+	<span class="keyword">if</span> ( len == 0 ) {
+	    reqinfo-&gt;status = 400;
+	    <span class="keyword">return</span> -1;
+	}
+
+	<span class="comment">/*  ...and store it in the request information structure.  */</span>
+
+	reqinfo-&gt;resource = calloc(len + 1, <span class="keyword">sizeof</span>(<span class="keyword">char</span>));
+	strncpy(reqinfo-&gt;resource, buffer, len);
+
+	
+	<span class="comment">/*  Test to see if we have any HTTP version information.
+	    If there isn't, this is a simple HTTP request, and we
+	    should not try to read any more headers. For simplicity,
+	    we don't bother checking the validity of the HTTP version
+	    information supplied - we just assume that if it is
+	    supplied, then it's a full request.                        */</span>
+
+	<span class="keyword">if</span> ( strstr(buffer, "HTTP/") )
+	    reqinfo-&gt;type = FULL;
+	<span class="keyword">else</span>
+	    reqinfo-&gt;type = SIMPLE;
+
+	first_header = 0;
+	<span class="keyword">return</span> 0;
+    }
+
+
+    <span class="comment">/*  If we get here, we have further headers aside from the
+	request line to parse, so this is a "full" HTTP request.  */</span>
+
+    <span class="comment">/*  HTTP field names are case-insensitive, so make an
+	upper-case copy of the field name to aid comparison.
+	We need to make a copy of the header up until the colon.
+	If there is no colon, we return a status code of 400
+	(bad request) and terminate the connection. Note that
+	HTTP/1.0 allows (but discourages) headers to span multiple
+	lines if the following lines start with a space or a
+	tab. For simplicity, we do not allow this here.              */</span>
+
+    endptr = strchr(buffer, ':');
+    <span class="keyword">if</span> ( endptr == NULL ) {
+	reqinfo-&gt;status = 400;
+	<span class="keyword">return</span> -1;
+    }
+
+    temp = calloc( (endptr - buffer) + 1, <span class="keyword">sizeof</span>(<span class="keyword">char</span>) );
+    strncpy(temp, buffer, (endptr - buffer));
+    StrUpper(temp);
+
+
+    <span class="comment">/*  Increment buffer so that it now points to the value.
+	If there is no value, just return.                    */</span>
+
+    buffer = endptr + 1;
+    <span class="keyword">while</span> ( *buffer &amp;&amp; isspace(*buffer) )
+	++buffer;
+    <span class="keyword">if</span> ( *buffer == '\0' )
+     	<span class="keyword">return</span> 0;
+
+
+    <span class="comment">/*  Now update the request information structure with the
+	appropriate field value. This version only supports the
+	"Referer:" and "User-Agent:" headers, ignoring all others.  */</span>
+
+    <span class="keyword">if</span> ( !strcmp(temp, "USER-AGENT") ) {
+	    reqinfo-&gt;useragent = malloc( strlen(buffer) + 1 );
+	    strcpy(reqinfo-&gt;useragent, buffer);
+    }
+    <span class="keyword">else</span> <span class="keyword">if</span> ( !strcmp(temp, "REFERER") ) {
+	    reqinfo-&gt;referer = malloc( strlen(buffer) + 1 );
+	    strcpy(reqinfo-&gt;referer, buffer);
+    }
+
+    free(temp);
+    <span class="keyword">return</span> 0;
+}
+
+
+<span class="comment">/*  Gets request headers. A CRLF terminates a HTTP header line,
+    but if one is never sent we would wait forever. Therefore,
+    we use select() to set a maximum length of time we will
+    wait for the next complete header. If we timeout before
+    this is received, we terminate the connection.               */</span>
+
+<span class="keyword">int</span> Get_Request(<span class="keyword">int</span> conn, <span class="keyword">struct</span> ReqInfo * reqinfo) {
+
+    <span class="keyword">char</span>   buffer[MAX_REQ_LINE] = {0};
+    <span class="keyword">int</span>    rval;
+    fd_set fds;
+    <span class="keyword">struct</span> timeval tv;
+
+
+    <span class="comment">/*  Set timeout to 5 seconds  */</span>
+
+    tv.tv_sec  = 5;
+    tv.tv_usec = 0;
+
+
+    <span class="comment">/*  Loop through request headers. If we have a simple request,
+	then we will loop only once. Otherwise, we will loop until
+	we receive a blank line which signifies the end of the headers,
+	or until select() times out, whichever is sooner.                */</span>
+
+    <span class="keyword">do</span> {
+
+	<span class="comment">/*  Reset file descriptor set  */</span>
+
+	FD_ZERO(&amp;fds);
+	FD_SET (conn, &amp;fds);
+
+
+	<span class="comment">/*  Wait until the timeout to see if input is ready  */</span>
+
+	rval = select(conn + 1, &amp;fds, NULL, NULL, &amp;tv);
+
+
+	<span class="comment">/*  Take appropriate action based on return from select()  */</span>
+
+	<span class="keyword">if</span> ( rval &lt; 0 ) {
+	    Error_Quit("Error calling select() in get_request()");
+	}
+	<span class="keyword">else</span> <span class="keyword">if</span> ( rval == 0 ) {
+
+	    <span class="comment">/*  input not ready after timeout  */</span>
+
+	    <span class="keyword">return</span> -1;
+
+	}
+	<span class="keyword">else</span> {
+
+	    <span class="comment">/*  We have an input line waiting, so retrieve it  */</span>
+
+	    Readline(conn, buffer, MAX_REQ_LINE - 1);
+	    Trim(buffer);
+
+	    <span class="keyword">if</span> ( buffer[0] == '\0' )
+		<span class="keyword">break</span>;
+
+	    <span class="keyword">if</span> ( Parse_HTTP_Header(buffer, reqinfo) )
+		<span class="keyword">break</span>;
+	}
+    } <span class="keyword">while</span> ( reqinfo-&gt;type != SIMPLE );
+
+    <span class="keyword">return</span> 0;
+}
+
+
+<span class="comment">/*  Initialises a request information structure  */</span>
+
+<span class="keyword">void</span> InitReqInfo(<span class="keyword">struct</span> ReqInfo * reqinfo) {
+    reqinfo-&gt;useragent = NULL;
+    reqinfo-&gt;referer   = NULL;
+    reqinfo-&gt;resource  = NULL;
+    reqinfo-&gt;method    = UNSUPPORTED;
+    reqinfo-&gt;status    = 200;          
+}
+
+
+<span class="comment">/*  Frees memory allocated for a request information structure  */</span>
+
+<span class="keyword">void</span> FreeReqInfo(<span class="keyword">struct</span> ReqInfo * reqinfo) {
+    <span class="keyword">if</span> ( reqinfo-&gt;useragent )
+	free(reqinfo-&gt;useragent);
+    <span class="keyword">if</span> ( reqinfo-&gt;referer )
+	free(reqinfo-&gt;referer);
+    <span class="keyword">if</span> ( reqinfo-&gt;resource )
+	free(reqinfo-&gt;resource);
+}
+</pre>
+
+<br><hr><br>
+
+
+<!--  resphead.h  -->
+
+<h2>resphead.h</h2>
+
+<br>
+
+<pre><span class="comment">/*
+
+  RESPHEAD.H
+  ==========
+  (c) Copyright Paul Griffiths 1999
+  Email: mail@paulgriffiths.net
+
+  Interface to HTTP response header functions
+
+*/</span>
+
+
+<span class="keyword">#ifndef</span> PG_RESPHEAD_H
+<span class="keyword">#define</span> PG_RESPHEAD_H
+
+
+<span class="keyword">#include</span> "reqhead.h"          <span class="comment">/*  for struct ReqInfo  */</span>
+
+
+<span class="comment">/*  Function prototypes  */</span>
+
+<span class="keyword">int</span> Output_HTTP_Headers(<span class="keyword">int</span> conn, <span class="keyword">struct</span> ReqInfo * reqinfo);
+
+
+<span class="keyword">#endif</span>  <span class="comment">/*  PG_RESPHEAD_H  */</span>
+</pre>
+
+<br><hr><br>
+
+
+<!--  resphead.c  -->
+
+<h2>resphead.c</h2>
+
+<br>
+
+<pre><span class="comment">/*
+
+  RESPHEAD.C
+  ==========
+  (c) Copyright Paul Griffiths 1999
+  Email: mail@paulgriffiths.net
+
+  Implementation of HTTP reponse header functions.
+
+*/</span>
+
+
+<span class="keyword">#include</span> &lt;unistd.h&gt;
+
+<span class="keyword">#include</span> &lt;stdio.h&gt;
+
+<span class="keyword">#include</span> "resphead.h"
+<span class="keyword">#include</span> "helper.h"
+
+
+<span class="comment">/*  Outputs HTTP response headers  */</span>
+
+<span class="keyword">int</span> Output_HTTP_Headers(<span class="keyword">int</span> conn, <span class="keyword">struct</span> ReqInfo * reqinfo) {
+
+    <span class="keyword">char</span> buffer[100];
+
+    sprintf(buffer, "HTTP/1.0 %d OK\r\n", reqinfo-&gt;status);
+    Writeline(conn, buffer, strlen(buffer));
+
+    Writeline(conn, "Server: PGWebServ v0.1\r\n", 24);
+    Writeline(conn, "Content-Type: text/html\r\n", 25);
+    Writeline(conn, "\r\n", 2);
+
+    <span class="keyword">return</span> 0;
+}
+
+</pre>
+
+<br><hr><br>
+
+
+<!--  resource.h  -->
+
+<h2>resource.h</h2>
+
+<br>
+
+<pre><span class="comment">/*
+
+  RESOURCE.H
+  ==========
+  (c) Copyright Paul Griffiths 1999
+  Email: mail@paulgriffiths.net
+
+  Interface to functions for returning a resource.
+
+*/</span>
+
+
+<span class="keyword">#ifndef</span> PG_RESOURCE_H
+<span class="keyword">#define</span> PG_RESOURCE_H
+
+
+<span class="keyword">#include</span> "reqhead.h"         <span class="comment">/*  for struct ReqInfo  */</span>
+
+
+<span class="comment">/*  Function prototypes  */</span>
+
+<span class="keyword">int</span> Return_Resource (<span class="keyword">int</span> conn, <span class="keyword">int</span> resource, <span class="keyword">struct</span> ReqInfo * reqinfo);
+<span class="keyword">int</span> Check_Resource  (<span class="keyword">struct</span> ReqInfo * reqinfo);
+<span class="keyword">int</span> Return_Error_Msg(<span class="keyword">int</span> conn, <span class="keyword">struct</span> ReqInfo * reqinfo);
+
+
+<span class="keyword">#endif</span>  <span class="comment">/*  PG_RESOURCE_H  */</span>
+</pre>
+
+<br><hr><br>
+
+
+<!--  resource.c  -->
+
+<h2>resource.c</h2>
+
+<br>
+
+<pre><span class="comment">/*
+
+  RESOURCE.C
+  ==========
+  (c) Copyright Paul Griffiths 1999
+  Email: mail@paulgriffiths.net
+
+  Implementation of functions for returning a resource.
+
+*/</span>
+
+
+<span class="keyword">#include</span> &lt;unistd.h&gt;
+<span class="keyword">#include</span> &lt;fcntl.h&gt;
+
+<span class="keyword">#include</span> &lt;string.h&gt;
+<span class="keyword">#include</span> &lt;stdio.h&gt;
+
+<span class="keyword">#include</span> "resource.h"
+<span class="keyword">#include</span> "reqhead.h"
+<span class="keyword">#include</span> "helper.h"
+
+
+<span class="comment">/*  Change this string to change the root directory that
+    the server will use, i.e. /index.html will translate
+    here to /home/httpd/html/index.html                   */</span>
+
+<span class="keyword">static</span> <span class="keyword">char</span> server_root[1000] = "/home/httpd/html";
+
+
+<span class="comment">/*  Returns a resource  */</span>
+
+<span class="keyword">int</span> Return_Resource(<span class="keyword">int</span> conn, <span class="keyword">int</span> resource, <span class="keyword">struct</span> ReqInfo * reqinfo) {
+
+    <span class="keyword">char</span> c;
+    <span class="keyword">int</span>  i;
+
+    <span class="keyword">while</span> ( (i = read(resource, &amp;c, 1)) ) {
+	<span class="keyword">if</span> ( i &lt; 0 )
+	    Error_Quit("Error reading from file.");
+	<span class="keyword">if</span> ( write(conn, &amp;c, 1) &lt; 1 )
+	    Error_Quit("Error sending file.");
+    }
+
+    <span class="keyword">return</span> 0;
+}
+
+
+<span class="comment">/*  Tries to open a resource. The calling function can use
+    the return value to check for success, and then examine
+    errno to determine the cause of failure if neceesary.    */</span>
+
+<span class="keyword">int</span> Check_Resource(<span class="keyword">struct</span> ReqInfo * reqinfo) {
+
+    <span class="comment">/*  Resource name can contain urlencoded
+	data, so clean it up just in case.    */</span>
+
+    CleanURL(reqinfo-&gt;resource);
+
+    
+    <span class="comment">/*  Concatenate resource name to server root, and try to open  */</span>
+
+    strcat(server_root, reqinfo-&gt;resource);
+    <span class="keyword">return</span> open(server_root, O_RDONLY);
+}
+
+
+<span class="comment">/*  Returns an error message  */</span>
+
+<span class="keyword">int</span> Return_Error_Msg(<span class="keyword">int</span> conn, <span class="keyword">struct</span> ReqInfo * reqinfo) {
+    
+    <span class="keyword">char</span> buffer[100];
+
+    sprintf(buffer, "&lt;HTML&gt;\n&lt;HEAD&gt;\n&lt;TITLE&gt;Server Error %d&lt;/TITLE&gt;\n"
+	            "&lt;/HEAD&gt;\n\n", reqinfo-&gt;status);
+    Writeline(conn, buffer, strlen(buffer));
+
+    sprintf(buffer, "&lt;BODY&gt;\n&lt;H1&gt;Server Error %d&lt;/H1&gt;\n", reqinfo-&gt;status);
+    Writeline(conn, buffer, strlen(buffer));
+
+    sprintf(buffer, "&lt;P&gt;The request could not be completed.&lt;/P&gt;\n"
+	            "&lt;/BODY&gt;\n&lt;/HTML&gt;\n");
+    Writeline(conn, buffer, strlen(buffer));
+
+    <span class="keyword">return</span> 0;
+
+}
+</pre>
+
+<br><hr><br>
+
+
+<!--  helper.h  -->
+
+<h2>helper.h</h2>
+
+<br>
+
+<pre><span class="comment">/*
+
+  HELPER.H
+  ========
+  (c) Copyright Paul Griffiths 1999
+  Email: mail@paulgriffiths.net
+
+  Interface to helper functions for simple webserver.
+
+*/</span>
+
+
+<span class="keyword">#ifndef</span> PG_HELPER_H
+<span class="keyword">#define</span> PG_HELPER_H
+
+
+<span class="keyword">#include</span> &lt;unistd.h&gt;          <span class="comment">/*  for ssize_t data type  */</span>
+
+
+<span class="comment">/*  Function prototypes  */</span>
+
+<span class="keyword">void</span>    Error_Quit(<span class="keyword">char</span> <span class="keyword">const</span> * msg);
+<span class="keyword">int</span>     Trim      (<span class="keyword">char</span> * buffer);
+<span class="keyword">int</span>     StrUpper  (<span class="keyword">char</span> * buffer);
+<span class="keyword">void</span>    CleanURL  (<span class="keyword">char</span> * buffer);
+ssize_t Readline  (<span class="keyword">int</span> sockd, <span class="keyword">void</span> *vptr, size_t maxlen);
+ssize_t Writeline (<span class="keyword">int</span> sockd, <span class="keyword">const</span> <span class="keyword">void</span> *vptr, size_t n);
+
+
+<span class="comment">/*  Global macros/variables  */</span>
+
+<span class="keyword">#define</span> LISTENQ          (1024)
+
+
+<span class="keyword">#endif</span>  <span class="comment">/*  PG_HELPER_H  */</span>
+</pre>
+
+<br><hr><br>
+
+
+<!--  helper.c  -->
+
+<h2>helper.c</h2>
+
+<br>
+
+<pre><span class="comment">/*
+
+  HELPER.C
+  ========
+  (c) Copyright Paul Griffiths 1999
+  Email: mail@paulgriffiths.net
+
+  Implementation of helper functions for simple web server.
+  The Readline() and Writeline() functions are shamelessly
+  ripped from "UNIX Network Programming" by W Richard Stevens.
+
+*/</span>
+
+
+<span class="keyword">#include</span> &lt;stdlib.h&gt;
+<span class="keyword">#include</span> &lt;stdio.h&gt;
+<span class="keyword">#include</span> &lt;errno.h&gt;
+<span class="keyword">#include</span> &lt;ctype.h&gt;
+
+<span class="keyword">#include</span> "helper.h"
+
+
+<span class="comment">/*  Prints an error message and quits  */</span>
+
+<span class="keyword">void</span> Error_Quit(<span class="keyword">char</span> <span class="keyword">const</span> * msg) {
+    fprintf(stderr, "WEBSERV: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+ 
+<span class="comment">/*  Read a line from a socket  */</span>
+
+ssize_t Readline(<span class="keyword">int</span> sockd, <span class="keyword">void</span> *vptr, size_t maxlen) {
+    ssize_t n, rc;
+    <span class="keyword">char</span>    c, *buffer;
+
+    buffer = vptr;
+
+    <span class="keyword">for</span> ( n = 1; n &lt; maxlen; n++ ) {
+	
+	<span class="keyword">if</span> ( (rc = read(sockd, &amp;c, 1)) == 1 ) {
+	    *buffer++ = c;
+	    <span class="keyword">if</span> ( c == '\n' )
+		<span class="keyword">break</span>;
+	}
+	<span class="keyword">else</span> <span class="keyword">if</span> ( rc == 0 ) {
+	    <span class="keyword">if</span> ( n == 1 )
+		<span class="keyword">return</span> 0;
+	    <span class="keyword">else</span>
+		<span class="keyword">break</span>;
+	}
+	<span class="keyword">else</span> {
+	    <span class="keyword">if</span> ( errno == EINTR )
+		<span class="keyword">continue</span>;
+	    Error_Quit("Error in Readline()");
+	}
+    }
+
+    *buffer = 0;
+    <span class="keyword">return</span> n;
+}
+
+
+<span class="comment">/*  Write a line to a socket  */</span>
+
+ssize_t Writeline(<span class="keyword">int</span> sockd, <span class="keyword">const</span> <span class="keyword">void</span> *vptr, size_t n) {
+    size_t      nleft;
+    ssize_t     nwritten;
+    <span class="keyword">const</span> <span class="keyword">char</span> *buffer;
+
+    buffer = vptr;
+    nleft  = n;
+
+    <span class="keyword">while</span> ( nleft &gt; 0 ) {
+	<span class="keyword">if</span> ( (nwritten = write(sockd, buffer, nleft)) &lt;= 0 ) {
+	    <span class="keyword">if</span> ( errno == EINTR )
+		nwritten = 0;
+	    <span class="keyword">else</span>
+		Error_Quit("Error in Writeline()");
+	}
+	nleft  -= nwritten;
+	buffer += nwritten;
+    }
+
+    <span class="keyword">return</span> n;
+}
+
+
+<span class="comment">/*  Removes trailing whitespace from a string  */</span>
+
+<span class="keyword">int</span> Trim(<span class="keyword">char</span> * buffer) {
+    <span class="keyword">int</span> n = strlen(buffer) - 1;
+
+    <span class="keyword">while</span> ( !isalnum(buffer[n]) &amp;&amp; n &gt;= 0 )
+	buffer[n--] = '\0';
+
+    <span class="keyword">return</span> 0;
+}
+
+
+<span class="comment">/*  Converts a string to upper-case  */</span>
+    
+<span class="keyword">int</span> StrUpper(<span class="keyword">char</span> * buffer) {
+    <span class="keyword">while</span> ( *buffer ) {
+	*buffer = toupper(*buffer);
+	++buffer;
+    }
+    <span class="keyword">return</span> 0;
+}
+
+
+<span class="comment">/*  Cleans up url-encoded string  */</span>
+	
+<span class="keyword">void</span> CleanURL(<span class="keyword">char</span> * buffer) {
+    <span class="keyword">char</span> asciinum[3] = {0};
+    <span class="keyword">int</span> i = 0, c;
+    
+    <span class="keyword">while</span> ( buffer[i] ) {
+	<span class="keyword">if</span> ( buffer[i] == '+' )
+	    buffer[i] = ' ';
+	<span class="keyword">else</span> <span class="keyword">if</span> ( buffer[i] == '%' ) {
+	    asciinum[0] = buffer[i+1];
+	    asciinum[1] = buffer[i+2];
+	    buffer[i] = strtol(asciinum, NULL, 16);
+	    c = i+1;
+	    <span class="keyword">do</span> {
+		buffer[c] = buffer[c+2];
+	    } <span class="keyword">while</span> ( buffer[2+(c++)] );
+	}
+	++i;
+    }
+}
+</pre>
+
+<br><hr><br>
+
+
+<span class="info">Please send all comments, suggestions, bug reports etc to <a href="mailto:mail@paulgriffiths.net">mail@paulgriffiths.net</a></span>
+
+<br><br><hr><br>
+
+
+
+
+
+</body></html>

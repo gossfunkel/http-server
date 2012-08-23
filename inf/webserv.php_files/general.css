@@ -1,0 +1,331 @@
+/*  BODY  */
+
+body {
+  margin: 0; padding: 10px 0 30px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  color: #444; background: #F3F3FF url(/images/general/structure/body.png) repeat-y top center;
+}
+
+
+/*  MAIN DIVISION  */
+
+#main {
+  position: relative;
+  width: 800px;
+  margin: 0 auto; padding: 211px 0 0;
+  text-align: left;
+  color: #444; background: transparent url(/images/general/structure/header.jpeg) no-repeat top center;
+}
+
+
+/*  CONTENT DIVISION  */
+
+#content {
+  position: relative;
+  width: 620px;
+  margin: 0; padding: 0;
+  color: #444; background: transparent url(/images/general/structure/contentbody.png) repeat-y top center;
+}
+
+#content h1 {
+  text-align: center;
+  font-size: 1.8em;
+  margin: 0; padding: 20px;
+  color: #559; background: transparent url(/images/general/structure/contenttop.png) no-repeat top center;
+}
+
+#content h2 {
+  text-align: left;
+  font-size: 1.4em;
+  margin: 0; padding: 1.5em 40px 1em;
+  color: #559; background-color: transparent;
+}
+
+#content h3 {
+  text-align: left;
+  font-size: 1.2em;
+  margin: 0; padding: 1.5em 40px 1em;
+  color: #559; background-color: transparent;
+}
+
+#content blockquote {
+  margin: 0; padding: 0.5em 40px;
+}
+
+#content blockquote p {
+  margin: 0; padding: 0.5em 2em;
+}
+
+#content li blockquote {
+  margin: 0; padding: 0.5em 0;
+}
+
+#content p {
+  margin: 0; padding: 0.5em 40px;
+  color: #444; background-color: transparent;
+}
+
+#content p.toplink {
+  text-align: right;
+  font-size: smaller;
+  padding-top: 1.5em;
+}
+
+#content p.code {
+  border: 1px solid #999;
+  margin: 1em 60px; padding: 1em;
+  color: #444; background-color: #F3F3FF;
+}
+
+#content pre {
+  border: 1px solid #999;
+  margin: 1em 60px; padding: 1em;
+  color: #444; background-color: #F3F3FF;
+}
+
+#content code {
+  font-family: "Courier New", courier, monospace;
+}
+
+#content ul {
+  margin: 0; padding: 0.5em 40px 0.5em 40px;
+}
+
+#content ul ul {
+  margin: 0; padding: 0.5em 0 0.5em 1em;
+}
+
+#content ul ol {
+  margin: 0; padding: 0.5em 0 0.5em 1em;
+}
+
+#content ul li {
+  margin: 0 0 0 3em; padding: 0.1em 0 0.1em 1em;
+}
+
+#content ul li.navskip {
+  display: none;
+}
+
+#content ol {
+  margin: 0; padding: 0.5em 40px 0.5em 40px;
+}
+
+#content ol ol {
+  margin: 0; padding: 0.5em 0 0.5em 1em;
+}
+
+#content ol ul {
+  margin: 0; padding: 0.5em 0 0.5em 1em;
+}
+
+#content ol li {
+  margin: 0 0 0 3em; padding: 0.1em 0 0.1em 1em;
+}
+
+#content ol li.navskip {
+  display: none;
+}
+
+#content dl {
+  margin: 0; padding: 0.5em 40px 1.5em 40px;
+}
+
+#content dl dt {
+  margin: 0; padding: 1em 0 0.5em 2em;
+  font-weight: bold;
+}
+
+#content dl dd {
+  margin: 0; padding: 0 0 0 4em;
+  font-weight: normal;
+}
+
+#content a:link    { text-decoration: underline; color: #559; background-color: transparent; }
+#content a:visited { text-decoration: underline; color: #559; background-color: transparent; }
+#content a:active  { text-decoration: underline; color: #559; background-color: transparent; }
+#content a:focus   { text-decoration: underline; color: #559; background-color: transparent; }
+#content a:hover   { text-decoration: underline; color: #F55; background-color: transparent; }
+
+#content div.mainimg {
+  text-align: center;
+  margin: 0 auto 0; padding: 2em 0;
+}
+
+#content div.mainimg img {
+  border: 0;
+}
+
+#content div.maintable {
+  text-align: center;
+  margin: 0 10%; padding: 2em 0;
+}
+
+#content div.maintable table {
+  margin: 0 auto; padding: 0;
+  border-collapse: collapse;
+  border: 1px solid #999;
+}
+
+#content div.maintable table th {
+  margin: 0; padding: 0.3em;
+  color: #559; background-color: #D3D3DD;
+  border: 1px solid #999;
+}
+
+#content div.maintable table th[scope="row"] {
+  text-align: left;
+}
+
+#content div.maintable table th[scope="col"] {
+  text-align: center;
+}
+
+#content div.maintable table td {
+  margin: 0; padding: 0.3em;
+  text-align: left;
+  border: 1px solid #999;
+}
+
+#content div.maintable table td.control {
+  text-align: center;
+}
+
+#content div.maintable table td.image {
+  text-align: center;
+}
+
+#content div.maintable table tr td a {
+  border: 0;
+}
+
+#content div.maintable table tr td a img {
+  border: 0;
+}
+
+#content .linksep {
+  display: none;
+}
+
+#sectionlinks {
+  margin-top: 2em;
+  text-align: center;
+  font-size: smaller;
+}
+
+#sectionlinks a {
+  margin: 0 3em;
+}
+
+#footer {
+  margin: 15px 0 0; padding: 15px 0 0;
+  color: #444; background: #F3F3FF url(/images/general/structure/contentbottom.png) no-repeat top center;
+}
+
+#footer p {
+  margin: 0; padding: 0 0 0 5px;
+  font-size: smaller;
+  color: #559; background-color: transparent;
+}
+
+#searchresults {
+  margin: 0 0 0 60px; padding: 0;
+}
+
+
+/*  SIDEBAR DIVISION  */
+
+#sidebar {
+  position: absolute;
+  width: 180px; left: 620px; top: 211px;
+  margin: 0; padding: 0 0 30px;
+  color: #444; background: #F3F3FF;
+}
+
+#sidebar h2 {
+  margin:0; padding: 7px 20px 0 15px;
+  height: 30px;
+  font-weight: bold; font-size: 14px;
+  color: #77A; background: transparent url(/images/general/structure/sidepaneltop.png) no-repeat top center;
+}
+
+#sidebar ul {
+  margin: 0; padding: 0 25px 15px 20px;
+  list-style-type: none;
+  color: #444; background: transparent url(/images/general/structure/sidepanelbottom.png) no-repeat bottom center;
+}
+
+#sidebar ul li {
+  margin: 0; padding: 0;
+}
+
+#sidebar ul li a:link    { text-decoration: none; color: #888; background-color: transparent; }
+#sidebar ul li a:visited { text-decoration: none; color: #888; background-color: transparent; }
+#sidebar ul li a:active  { text-decoration: none; color: #888; background-color: transparent; }
+#sidebar ul li a:focus   { text-decoration: none; color: #888; background-color: transparent; }
+#sidebar ul li a:hover   { text-decoration: none; color: #559; background-color: transparent; }
+
+#navmenu {
+  margin: 0; padding: 0;
+  color: #444; background: transparent url(/images/general/structure/sidepanelbody.png) repeat-y top center;
+}
+
+#validity {
+  margin: 0; padding: 0;
+  color: #444; background: transparent url(/images/general/structure/sidepanelbody.png) repeat-y top center;
+}
+
+#googlesearch {
+  font-size: 10px;
+  margin: 0; padding: 0;
+  color: #444; background: transparent url(/images/general/structure/sidepanelbody.png) repeat-y top center;
+}
+
+#googlesearch form {
+  font-size: 10px;
+  margin: 0; padding: 0 20px 15px;
+  color: #444; background: transparent url(/images/general/structure/sidepanelbottom.png) no-repeat bottom center;
+}
+
+#googlesearch form table {
+  font-size: 10px;
+  margin: 0; padding: 0;
+}
+
+#googlesearch form table table {
+  display: none;
+}
+
+#googleads {
+  margin: 0; padding: 0;
+  color: #444; background: transparent url(/images/general/structure/sidepanelbody.png) repeat-y top center;
+}
+
+#googleadcontent {
+  margin: 0; padding: 7px 0 15px 9px;
+  color: #444; background: transparent url(/images/general/structure/sidepanelbottom.png) no-repeat bottom center;
+}
+
+
+/*  BREADCRUMBS DIVISION  */
+
+#breadcrumbs {
+  position: absolute;
+  width: 800px; left: 0px; top: 173px;
+  height: 33px;
+  margin: 0; padding: 0;
+  color: #77A; background: transparent url(/images/general/structure/breadcrumb.png) no-repeat top center;
+}
+
+#breadcrumbs p {
+  margin: 0; padding: 7px 0 0 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#breadcrumbs p a:link    { text-decoration: underline; color: #77A; background-color: transparent; }
+#breadcrumbs p a:visited { text-decoration: underline; color: #77A; background-color: transparent; }
+#breadcrumbs p a:active  { text-decoration: underline; color: #77A; background-color: transparent; }
+#breadcrumbs p a:focus   { text-decoration: underline; color: #77A; background-color: transparent; }
+#breadcrumbs p a:hover   { text-decoration: underline; color: #F55; background-color: transparent; }
